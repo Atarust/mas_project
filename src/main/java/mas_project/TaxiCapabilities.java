@@ -1,10 +1,14 @@
 package mas_project;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.measure.Measure;
 import javax.measure.quantity.Length;
 
+import com.github.rinde.rinsim.core.model.comm.CommDevice;
+import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
+import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.MessageContents;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
@@ -13,6 +17,7 @@ import com.github.rinde.rinsim.core.model.road.RoadModel;
 import com.github.rinde.rinsim.core.model.road.RoadUser;
 import com.github.rinde.rinsim.core.model.time.TimeLapse;
 import com.github.rinde.rinsim.geom.Point;
+import com.google.common.base.Optional;
 
 /**
  * This class is like your mummy. It tells you what you are allowed to do and
@@ -26,7 +31,7 @@ import com.github.rinde.rinsim.geom.Point;
  * @author jonas
  *
  */
-public class TaxiCapabilities {
+public class TaxiCapabilities implements CommUser {
 
 	private final Vehicle agent;
 	private final RoadModel rm;
@@ -34,6 +39,8 @@ public class TaxiCapabilities {
 	private final double speed; // may be used to calculate shortest path accorcing to time
 	private final double seeRange; // straight line distance
 	private final double commRange;
+	private final double commReliability;
+	Optional<CommDevice> device;
 
 	/**
 	 * @param agent
@@ -48,7 +55,9 @@ public class TaxiCapabilities {
 		this.pm = pm;
 		this.speed = speed;
 		this.seeRange = seeRange;
+		device = Optional.absent();
 		this.commRange = commRange;
+		this.commReliability = 0;
 	}
 
 	/**
@@ -102,8 +111,24 @@ public class TaxiCapabilities {
 		pm.deliver(agent, parcel, time);
 	}
 
-	public void broadcast(Message info) {
-		// TODO
+	/**
+	 * broadcast position of a roadUser
+	 * 
+	 * @param obj
+	 * @param point
+	 *            position of obj
+	 */
+	public void broadcast(RoadUser obj, Point point) {
+		device.get().broadcast(new ObjectPosition(obj, point), commRange);
+	}
+
+	/**
+	 * @return object location information, which were broadcasted since last
+	 *         function call.
+	 */
+	public Set<ObjectPosition> readMessages() {
+		return device.get().getUnreadMessages().stream().map(message -> (ObjectPosition) message.getContents())
+				.collect(Collectors.toSet());
 	}
 
 	/**
@@ -120,6 +145,36 @@ public class TaxiCapabilities {
 
 	private Set<RoadUser> getObjInRange(Point point, double range) {
 		return rm.getObjects(obj -> Point.distance(point, rm.getPosition(obj)) < range);
+	}
+
+	@Override
+	public Optional<Point> getPosition() {
+		if (rm.containsObject(agent)) {
+			return Optional.of(rm.getPosition(agent));
+		}
+		return Optional.absent();
+	}
+
+	@Override
+	public void setCommDevice(CommDeviceBuilder builder) {
+		if (commRange >= 0) {
+			builder.setMaxRange(commRange);
+		}
+		device = Optional.of(builder.setReliability(commReliability).build());
+	}
+
+	static class ObjectPosition implements MessageContents {
+		public final RoadUser obj;
+		public final Point point;
+
+		ObjectPosition(RoadUser obj, Point point) {
+			this.obj = obj;
+			this.point = point;
+		}
+
+		String get() {
+			return "" + obj + point;
+		}
 	}
 
 }

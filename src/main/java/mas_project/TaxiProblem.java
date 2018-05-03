@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 
 import com.github.rinde.rinsim.core.Simulator;
+import com.github.rinde.rinsim.core.model.comm.CommModel;
 import com.github.rinde.rinsim.core.model.pdp.DefaultPDPModel;
 import com.github.rinde.rinsim.core.model.pdp.Depot;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
@@ -45,6 +46,7 @@ import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.geom.io.DotGraphIO;
 import com.github.rinde.rinsim.geom.io.Filters;
 import com.github.rinde.rinsim.ui.View;
+import com.github.rinde.rinsim.ui.renderers.CommRenderer;
 import com.github.rinde.rinsim.ui.renderers.GraphRoadModelRenderer;
 import com.github.rinde.rinsim.ui.renderers.RoadUserRenderer;
 
@@ -122,6 +124,7 @@ public final class TaxiProblem {
     final Simulator simulator = Simulator.builder()
       .addModel(RoadModelBuilders.staticGraph(loadGraph(graphFile)))
       .addModel(DefaultPDPModel.builder())
+      .addModel(CommModel.builder())
       .addModel(view)
       .build();
     final RandomGenerator rng = simulator.getRandomGenerator();
@@ -186,7 +189,11 @@ public final class TaxiProblem {
         .withImageAssociation(
           Customer.class, "/graphics/flat/person-red-32.png"))
       //.with(TaxiRenderer.builder(Language.ENGLISH))
-      .withTitleAppendix("Taxi Demo");
+      .withTitleAppendix("Taxi Demo")
+      .with(CommRenderer.builder()
+            .withReliabilityColors()
+            .withToString()
+            .withMessageCount());
 
     if (testing) {
       view = view.withAutoClose()
