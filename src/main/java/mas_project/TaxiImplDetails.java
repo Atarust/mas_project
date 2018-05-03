@@ -22,6 +22,7 @@ public class TaxiImplDetails extends Vehicle {
 
 	private static final double SPEED = 1000d;
 	private static final double SEE_RANGE = 42;
+	private static final double COMM_RANGE = 1337;
 
 	protected TaxiImplDetails(Point startPosition, int capacity) {
 		super(getAgent(startPosition, capacity));
@@ -36,7 +37,7 @@ public class TaxiImplDetails extends Vehicle {
 		final RoadModel rm = getRoadModel();
 		final PDPModel pm = getPDPModel();
 		final IBDIAgent agent = new BDIAgent();
-		final TaxiCapabilities capabilities = new TaxiCapabilities(rm, pm, SPEED, SEE_RANGE);
+		final TaxiCapabilities capabilities = new TaxiCapabilities(this, rm, pm, SPEED, SEE_RANGE, COMM_RANGE);
 
 		agent.updateBelief(capabilities);
 		agent.updateDesire(capabilities);
