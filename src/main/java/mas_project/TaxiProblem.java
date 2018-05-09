@@ -69,9 +69,9 @@ public final class TaxiProblem {
   private static final int TAXI_CAPACITY = 1;
   private static final int DEPOT_CAPACITY = 100;
 
-  private static final int SPEED_UP = 4;
+  private static final int SPEED_UP = 20;
   private static final int MAX_CAPACITY = 1;
-  private static final double NEW_CUSTOMER_PROB = .007;
+  private static final double NEW_CUSTOMER_PROB = .01;
 
   private static final String MAP_FILE = "/data/maps/leuven-simple.dot";
   private static final Map<String, Graph<MultiAttributeData>> GRAPH_CACHE =
@@ -79,6 +79,8 @@ public final class TaxiProblem {
 
   private static final long TEST_STOP_TIME = 20 * 60 * 1000;
   private static final int TEST_SPEED_UP = 64;
+  
+  private static final long RANDOM_SEED = 42L;
 
   private TaxiProblem() {}
 
@@ -125,6 +127,7 @@ public final class TaxiProblem {
       .addModel(RoadModelBuilders.staticGraph(loadGraph(graphFile)))
       .addModel(DefaultPDPModel.builder())
       .addModel(CommModel.builder())
+      .setRandomSeed(RANDOM_SEED)
       .addModel(view)
       .build();
     final RandomGenerator rng = simulator.getRandomGenerator();
@@ -138,7 +141,7 @@ public final class TaxiProblem {
     }
     for (int i = 0; i < NUM_TAXIS; i++) {
       simulator.register(new TaxiImplDetails(roadModel.getRandomPosition(rng),
-        TAXI_CAPACITY));
+        TAXI_CAPACITY, rng));
     }
     for (int i = 0; i < NUM_CUSTOMERS; i++) {
       simulator.register(new Customer(
@@ -185,7 +188,7 @@ public final class TaxiProblem {
         .withImageAssociation(
           TaxiBase.class, "/graphics/perspective/tall-building-64.png")
         .withImageAssociation(
-          TaxiImplDetails.class, "/graphics/flat/taxi-32.png")
+        		TaxiImplDetails.class, "/graphics/flat/taxi-32.png")
         .withImageAssociation(
           Customer.class, "/graphics/flat/person-red-32.png"))
       //.with(TaxiRenderer.builder(Language.ENGLISH))

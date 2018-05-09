@@ -1,11 +1,13 @@
 package mas_project;
 
+import com.github.rinde.rinsim.core.model.time.TimeLapse;
+
 public interface IBDIAgent {
 
-	void updateBelief(TaxiCapabilities capabilities);
+	void updateBelief(TaxiAction capabilities, TimeLapse time);
 
-	void updateDesire(TaxiCapabilities capabilities);
+	void updateDesire(TaxiAction capabilities, TimeLapse time);
 
-	void updateIntention(TaxiCapabilities capabilities);
+	void updateIntention(TaxiAction capabilities, TimeLapse time);
 
 }
