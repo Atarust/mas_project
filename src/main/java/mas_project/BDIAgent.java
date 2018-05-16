@@ -63,16 +63,21 @@ public class BDIAgent implements IBDIAgent {
 
 	@Override
 	public void updateIntention(TaxiAction action, TimeLapse time) {
-
 		while (time.hasTimeLeft()) {
 			switch (state) {
 			case idle:
 				action.goTo(action.randomPosition(), time);
 				break;
 			case goto_parcel:
-				action.goTo(passenger.get().getPickupLocation(), time);
-				if (action.isAt(passenger.get().getPickupLocation())) {
-					state = State.pickup;
+				if (passenger.isPresent()) {
+					action.goTo(passenger.get().getPickupLocation(), time);
+					if (action.isAt(passenger.get().getPickupLocation())) {
+						state = State.pickup;
+						state.log();
+					}
+				} else {
+					// that shitty passenger seems to have disappeared.
+					state = State.idle;
 					state.log();
 				}
 				break;
