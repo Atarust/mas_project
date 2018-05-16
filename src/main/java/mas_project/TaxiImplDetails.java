@@ -8,6 +8,7 @@ import com.github.rinde.rinsim.core.model.pdp.VehicleDTO;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
 import com.github.rinde.rinsim.core.model.time.TimeLapse;
 import com.github.rinde.rinsim.geom.Point;
+import com.google.common.base.Optional;
 
 /**
  * This class is like your mommy. It hides all the bad and shitty details of the
@@ -26,8 +27,10 @@ public class TaxiImplDetails extends Vehicle {
 	private static final double SEE_RANGE = 42000000;
 	private static final double COMM_RANGE = 1337;
 	private final RandomGenerator rng;
-	
-	
+	private RoadModel rm;
+	private PDPModel pm;
+	private Optional<CommDevice> device;
+
 	private final IBDIAgent agent;
 
 	protected TaxiImplDetails(Point startPosition, int capacity, RandomGenerator rng) {
@@ -35,16 +38,16 @@ public class TaxiImplDetails extends Vehicle {
 		this.rng = rng;
 		agent = new BDIAgent(rng);
 	}
-	
+
 	@Override
 	public void afterTick(TimeLapse timeLapse) {
 	}
 
 	@Override
 	protected void tickImpl(TimeLapse time) {
-		final RoadModel rm = getRoadModel();
-		final PDPModel pm = getPDPModel();
-		final TaxiAction capabilities = new TaxiAction(this, rm, pm, rng, SPEED, SEE_RANGE, COMM_RANGE);
+		rm = getRoadModel();
+		pm = getPDPModel();
+		final TaxiAction capabilities = new TaxiAction(this, rm, pm, device, rng, SPEED, SEE_RANGE, COMM_RANGE);
 
 		agent.updateBelief(capabilities, time);
 		agent.updateDesire(capabilities, time);
