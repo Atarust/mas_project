@@ -1,5 +1,7 @@
 package mas_project;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,7 +24,13 @@ import com.google.common.base.Optional;
  *
  */
 public class BDIAgent implements IBDIAgent {
-	Map<RoadUser, Point> objects;
+	/** All objects, the agent knows of */
+	Map<RoadUser, Point> knownObjects;
+	/** Passengers, where other agents claimed to pick them up */
+	Set<Parcel> claimedParcels;
+	/** Passengers, which do not need to be picked up anymore. (TODO) */
+	Set<Parcel> oldParcels;
+
 	Optional<Parcel> passenger;
 	RandomGenerator rng;
 
@@ -31,6 +39,12 @@ public class BDIAgent implements IBDIAgent {
 
 	public BDIAgent(RandomGenerator rng) {
 		this.rng = rng;
+
+		// Beliefs/Desires
+		knownObjects = new HashMap<>();
+		claimedParcels = new HashSet<>();
+		oldParcels = new HashSet<>();
+		// Intention
 		passenger = Optional.absent();
 		state = State.idle;
 		state.log();
@@ -38,14 +52,15 @@ public class BDIAgent implements IBDIAgent {
 
 	@Override
 	public void updateBelief(TaxiAction action, TimeLapse time) {
-		objects = action.see();
+		knownObjects.putAll(action.see());
+		oldParcels.stream().forEach(oldPassenger -> knownObjects.remove(oldPassenger));
 	}
 
 	@Override
 	public void updateDesire(TaxiAction action, TimeLapse time) {
 		if (state == State.idle && !passenger.isPresent()) {
-			Set<RoadUser> passengers = objects.keySet().stream().filter(obj -> obj instanceof Parcel)
-					.collect(Collectors.toSet());
+			Set<RoadUser> passengers = knownObjects.keySet().stream().filter(obj -> obj instanceof Parcel)
+					.filter(obj -> !claimedParcels.contains(obj)).collect(Collectors.toSet());
 			if (!passengers.isEmpty()) {
 				passenger = Optional.of((Parcel) TaxiAction.getRandomElement(passengers, rng));
 				state = State.goto_parcel;
@@ -104,6 +119,7 @@ public class BDIAgent implements IBDIAgent {
 					System.out.println("Warning: Parcel was not in cargo anymore. idc lol");
 				}
 				if (action.hasEmptyCargo()) {
+					oldParcels.add(passenger.get());
 					passenger = Optional.absent();
 					state = State.idle;
 					state.log();
