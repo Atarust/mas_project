@@ -1,6 +1,7 @@
 package mas_project;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,8 +13,6 @@ import javax.measure.quantity.Length;
 import org.apache.commons.math3.random.RandomGenerator;
 
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
-import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
-import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.comm.MessageContents;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel.VehicleState;
@@ -37,7 +36,7 @@ import com.google.common.base.Optional;
  * @author jonas
  *
  */
-public class TaxiAction implements CommUser {
+public class TaxiAction {
 
 	private final Vehicle agent;
 	private final RoadModel rm;
@@ -45,7 +44,6 @@ public class TaxiAction implements CommUser {
 	private final double speed; // may be used to calculate shortest path according to time
 	private final double seeRange; // straight line distance
 	private final double commRange;
-	private final double commReliability;
 	Optional<CommDevice> device;
 
 	RandomGenerator rng;
@@ -58,16 +56,15 @@ public class TaxiAction implements CommUser {
 	 * @param speed
 	 * @param seeRange
 	 */
-	public TaxiAction(Vehicle agent, RoadModel rm, PDPModel pm, RandomGenerator rng, double speed, double seeRange,
-			double commRange) {
+	public TaxiAction(Vehicle agent, RoadModel rm, PDPModel pm, Optional<CommDevice> device, RandomGenerator rng,
+			double speed, double seeRange, double commRange) {
 		this.agent = agent;
 		this.rm = rm;
 		this.pm = pm;
 		this.speed = speed;
 		this.seeRange = seeRange;
-		device = Optional.absent();
+		this.device = device;
 		this.commRange = commRange;
-		this.commReliability = 0;
 
 		this.rng = rng;
 	}
@@ -189,14 +186,6 @@ public class TaxiAction implements CommUser {
 		return pm.containerContains(agent, parcel);
 	}
 
-	@Override
-	public Optional<Point> getPosition() {
-		if (rm.containsObject(agent)) {
-			return Optional.of(rm.getPosition(agent));
-		}
-		return Optional.absent();
-	}
-
 	/**
 	 * broadcast position of a roadUser
 	 * 
@@ -204,25 +193,46 @@ public class TaxiAction implements CommUser {
 	 * @param point
 	 *            position of obj
 	 */
-	public void broadcast(RoadUser obj, Point point) {
+	public void broadcastNewObject(RoadUser obj, Point point) {
+		// TODO make sure to broadcast not to oneself!
 		device.get().broadcast(new ObjectPosition(obj, point), commRange);
 	}
 
-	@Override
-	public void setCommDevice(CommDeviceBuilder builder) {
-		if (commRange >= 0) {
-			builder.setMaxRange(commRange);
+	/**
+	 * broadcast that agent has an intention to pick up passenger
+	 * 
+	 * @param passenger
+	 */
+	public void broadcastReservation(Parcel passenger) {
+		// TODO make sure to broadcast not to oneself!
+		if (device.isPresent()) {
+			System.out.println("broadcasting...");
+			device.get().broadcast(new Reservation(passenger), commRange);
 		}
-		device = Optional.of(builder.setReliability(commReliability).build());
+	}
+
+	/**
+	 * broadcast that agent has no intention to pick up passenger
+	 * 
+	 * @param passenger
+	 */
+	public void broadcastUnreservation(Parcel passenger) {
+		if (device.isPresent()) {
+			device.get().broadcast(new Unreservation(passenger), commRange);
+		}
 	}
 
 	/**
 	 * @return object location information, which were broadcasted since last
 	 *         function call.
 	 */
-	public Set<ObjectPosition> readMessages() {
-		return device.get().getUnreadMessages().stream().map(message -> (ObjectPosition) message.getContents())
-				.collect(Collectors.toSet());
+	public Set<MessageContents> readMessages() {
+		if (device.isPresent()) {
+			return device.get().getUnreadMessages().stream().map(message -> message.getContents())
+					.collect(Collectors.toSet());
+		} else {
+			return new HashSet<>();
+		}
 	}
 
 	public static <T> T getRandomElement(Collection<T> passengers, RandomGenerator rng) {
@@ -238,9 +248,21 @@ public class TaxiAction implements CommUser {
 			this.obj = obj;
 			this.point = point;
 		}
+	}
 
-		String get() {
-			return "" + obj + point;
+	static class Reservation implements MessageContents {
+		public final Parcel parcel;
+
+		Reservation(Parcel passenger) {
+			this.parcel = passenger;
+		}
+	}
+
+	static class Unreservation implements MessageContents {
+		public final Parcel parcel;
+
+		Unreservation(Parcel passenger) {
+			this.parcel = passenger;
 		}
 	}
 

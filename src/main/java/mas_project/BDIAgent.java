@@ -8,11 +8,14 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.math3.random.RandomGenerator;
 
+import com.github.rinde.rinsim.core.model.comm.MessageContents;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
 import com.github.rinde.rinsim.core.model.road.RoadUser;
 import com.github.rinde.rinsim.core.model.time.TimeLapse;
 import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Optional;
+
+import mas_project.TaxiAction.ObjectPosition;
 
 /**
  * This class is like a puppet play for little kiddies. Everything is simple and
@@ -53,6 +56,8 @@ public class BDIAgent implements IBDIAgent {
 	@Override
 	public void updateBelief(TaxiAction action, TimeLapse time) {
 		knownObjects.putAll(action.see());
+		// TODO broadcast all knowledge
+		knownObjects.putAll(processMessages(action));
 		oldParcels.stream().forEach(oldPassenger -> knownObjects.remove(oldPassenger));
 	}
 
@@ -63,11 +68,11 @@ public class BDIAgent implements IBDIAgent {
 					.filter(obj -> !claimedParcels.contains(obj)).collect(Collectors.toSet());
 			if (!passengers.isEmpty()) {
 				passenger = Optional.of((Parcel) TaxiAction.getRandomElement(passengers, rng));
+				action.broadcastReservation(passenger.get());
 				state = State.goto_parcel;
 				state.log();
 			}
 			Parcel parcel = passenger.get();
-
 			if (passenger.isPresent() && !action.isInCargo(parcel) && !action.isOnRoad(parcel)) {
 				passenger = Optional.absent();
 				System.out.println(
@@ -119,6 +124,7 @@ public class BDIAgent implements IBDIAgent {
 					System.out.println("Warning: Parcel was not in cargo anymore. idc lol");
 				}
 				if (action.hasEmptyCargo()) {
+					action.broadcastUnreservation(passenger.get());
 					oldParcels.add(passenger.get());
 					passenger = Optional.absent();
 					state = State.idle;
@@ -130,7 +136,18 @@ public class BDIAgent implements IBDIAgent {
 			}
 		}
 	}
-	
+
+	private Map<RoadUser, Point> processMessages(TaxiAction action) {
+		Map<RoadUser, Point> newObjects = new HashMap<>();
+		Set<MessageContents> messages = action.readMessages();
+		// save all objects seen by other agents into knownObjects
+		messages.stream().filter(m -> m instanceof TaxiAction.ObjectPosition).forEach(objPos -> {
+			ObjectPosition objPoint = (TaxiAction.ObjectPosition) objPos;
+			newObjects.put(objPoint.obj, objPoint.point);
+		});
+		return newObjects;
+	}
+
 	static enum State {
 		idle, goto_parcel, pickup, goto_dest, deliver;
 

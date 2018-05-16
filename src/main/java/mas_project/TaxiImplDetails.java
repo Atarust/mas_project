@@ -2,6 +2,9 @@ package mas_project;
 
 import org.apache.commons.math3.random.RandomGenerator;
 
+import com.github.rinde.rinsim.core.model.comm.CommDevice;
+import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
+import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
 import com.github.rinde.rinsim.core.model.pdp.Vehicle;
 import com.github.rinde.rinsim.core.model.pdp.VehicleDTO;
@@ -12,20 +15,21 @@ import com.google.common.base.Optional;
 
 /**
  * This class is like your mommy. It hides all the bad and shitty details of the
- * world and explains it in simple terms, that even little Donald Trump
- * could understand it. If you say: "Mom, I wanna go there!" Then your mommy
- * goes there with you. (BTW: You are a shitty little prat, that only has beliefs,
+ * world and explains it in simple terms, that even little Donald Trump could
+ * understand it. If you say: "Mom, I wanna go there!" Then your mommy goes
+ * there with you. (BTW: You are a shitty little prat, that only has beliefs,
  * desires and intentions)
  * 
  * 
  * @author jonas
  *
  */
-public class TaxiImplDetails extends Vehicle {
+public class TaxiImplDetails extends Vehicle implements CommUser {
 
 	private static final double SPEED = 30000d;
-	private static final double SEE_RANGE = 42000000;
-	private static final double COMM_RANGE = 1337;
+	private static final double SEE_RANGE = 13370;
+	private static final double COMM_RANGE = 13370;
+	private final double commReliability = 1;
 	private final RandomGenerator rng;
 	private RoadModel rm;
 	private PDPModel pm;
@@ -56,6 +60,22 @@ public class TaxiImplDetails extends Vehicle {
 
 	private static VehicleDTO getAgent(Point startPosition, int capacity) {
 		return VehicleDTO.builder().capacity(capacity).startPosition(startPosition).speed(SPEED).build();
+	}
+
+	@Override
+	public Optional<Point> getPosition() {
+		if (rm != null && rm.containsObject(this)) {
+			return Optional.of(rm.getPosition(this));
+		}
+		return Optional.absent();
+	}
+
+	@Override
+	public void setCommDevice(CommDeviceBuilder builder) {
+		if (COMM_RANGE >= 0) {
+			builder.setMaxRange(COMM_RANGE);
+		}
+		device = Optional.of(builder.setReliability(commReliability).build());
 	}
 
 }
