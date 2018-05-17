@@ -16,6 +16,8 @@ import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Optional;
 
 import mas_project.TaxiAction.ObjectPosition;
+import mas_project.TaxiAction.Reservation;
+import mas_project.TaxiAction.Unreservation;
 
 /**
  * This class is like a puppet play for little kiddies. Everything is simple and
@@ -56,8 +58,10 @@ public class BDIAgent implements IBDIAgent {
 	@Override
 	public void updateBelief(TaxiAction action, TimeLapse time) {
 		knownObjects.putAll(action.see());
-		// TODO broadcast all knowledge
-		knownObjects.putAll(processMessages(action));
+
+		// broadcast all knowledge
+		knownObjects.entrySet().stream().forEach(entry -> action.broadcastNewObject(entry.getKey(), entry.getValue()));
+		processMessages(action.readMessages());
 		oldParcels.stream().forEach(oldPassenger -> knownObjects.remove(oldPassenger));
 	}
 
@@ -137,15 +141,23 @@ public class BDIAgent implements IBDIAgent {
 		}
 	}
 
-	private Map<RoadUser, Point> processMessages(TaxiAction action) {
-		Map<RoadUser, Point> newObjects = new HashMap<>();
-		Set<MessageContents> messages = action.readMessages();
+	private void processMessages(Set<MessageContents> messages) {
 		// save all objects seen by other agents into knownObjects
 		messages.stream().filter(m -> m instanceof TaxiAction.ObjectPosition).forEach(objPos -> {
 			ObjectPosition objPoint = (TaxiAction.ObjectPosition) objPos;
-			newObjects.put(objPoint.obj, objPoint.point);
+			knownObjects.put(objPoint.obj, objPoint.point);
 		});
-		return newObjects;
+
+		// note which objects are going to be transported by other agents
+		messages.stream().filter(m -> m instanceof TaxiAction.Reservation).forEach(reservation -> {
+			claimedParcels.add(((Reservation) reservation).parcel);
+		});
+
+		// note, if objects are available to be picked up again.
+		messages.stream().filter(m -> m instanceof TaxiAction.Unreservation).forEach(unreservation -> {
+			Parcel parcelToForget = ((Unreservation) unreservation).parcel;
+			claimedParcels.remove(parcelToForget);
+		});
 	}
 
 	static enum State {
