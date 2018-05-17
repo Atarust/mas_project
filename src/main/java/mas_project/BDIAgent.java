@@ -99,7 +99,7 @@ public class BDIAgent implements IBDIAgent {
 						state.log();
 					}
 				} else {
-					// that shitty passenger seems to have disappeared.
+					System.out.println("that shitty passenger seems to have disappeared.");
 					state = State.idle;
 					state.log();
 				}
@@ -110,7 +110,12 @@ public class BDIAgent implements IBDIAgent {
 					if (action.isInCargo(passenger.get())) {
 						state = State.goto_dest;
 						state.log();
-					} // TODO: What happens if two taxis want to pickup the same passenger. Will stay stall?
+					}
+					// TODO: What happens if two taxis want to pickup the same passenger. Will they
+					// stall?
+				} else {
+					throw new RuntimeException(
+							"Can not deliver, because not at right position. This should NEVER happen");
 				}
 				break;
 			case goto_dest:
