@@ -76,8 +76,7 @@ public class BDIAgent implements IBDIAgent {
 				state = State.goto_parcel;
 				state.log();
 			}
-			Parcel parcel = passenger.get();
-			if (passenger.isPresent() && !action.isInCargo(parcel) && !action.isOnRoad(parcel)) {
+			if (passenger.isPresent() && !action.isInCargo(passenger.get()) && !action.isOnRoad(passenger.get())) {
 				passenger = Optional.absent();
 				System.out.println(
 						"warning: Passenger is neither in roadmap nor in cargo. Ain't nobody got time to search him!");
