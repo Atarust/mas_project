@@ -37,6 +37,7 @@ public class BDIAgent implements IBDIAgent {
 	Set<Parcel> oldParcels;
 
 	Optional<Parcel> passenger;
+	Optional<Point> randomPosition;
 	RandomGenerator rng;
 
 	State state;
@@ -51,6 +52,7 @@ public class BDIAgent implements IBDIAgent {
 		oldParcels = new HashSet<>();
 		// Intention
 		passenger = Optional.absent();
+		randomPosition = Optional.absent();
 		state = State.idle;
 		state.log();
 	}
@@ -63,6 +65,7 @@ public class BDIAgent implements IBDIAgent {
 		knownObjects.entrySet().stream().forEach(entry -> action.broadcastNewObject(entry.getKey(), entry.getValue()));
 		processMessages(action.readMessages());
 		oldParcels.stream().forEach(oldPassenger -> knownObjects.remove(oldPassenger));
+		oldParcels.stream().forEach(oldPassenger -> claimedParcels.remove(oldPassenger));
 	}
 
 	@Override
@@ -89,7 +92,15 @@ public class BDIAgent implements IBDIAgent {
 		while (time.hasTimeLeft()) {
 			switch (state) {
 			case idle:
-				action.goTo(action.randomPosition(), time);
+				if (randomPosition.isPresent()) {
+					if (action.isAt(randomPosition.get())) {
+						randomPosition = Optional.of(action.randomPosition());
+					}
+					action.goTo(randomPosition.get(), time);
+				} else {
+					randomPosition = Optional.of(action.randomPosition());
+				}
+
 				break;
 			case goto_parcel:
 				if (passenger.isPresent()) {
@@ -111,8 +122,8 @@ public class BDIAgent implements IBDIAgent {
 						state = State.goto_dest;
 						state.log();
 					}
-					// TODO: What happens if two taxis want to pickup the same passenger. Will they
-					// stall?
+					// TODO: If one agent is picking up a passenger and the other agent reaches
+					// that at the same time, they stall.
 				} else {
 					throw new RuntimeException(
 							"Can not deliver, because not at right position. This should NEVER happen");
