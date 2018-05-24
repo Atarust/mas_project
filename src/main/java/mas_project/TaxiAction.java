@@ -47,17 +47,19 @@ public class TaxiAction {
 	Optional<CommDevice> device;
 
 	RandomGenerator rng;
+	private Metric metric;
 
 	/**
 	 * @param agent
 	 * @param rm
 	 * @param pm
 	 * @param rng
+	 * @param metric 
 	 * @param speed
 	 * @param seeRange
 	 */
 	public TaxiAction(Vehicle agent, RoadModel rm, PDPModel pm, Optional<CommDevice> device, RandomGenerator rng,
-			double speed, double seeRange, double commRange) {
+			Metric metric, double speed, double seeRange, double commRange) {
 		this.agent = agent;
 		this.rm = rm;
 		this.pm = pm;
@@ -67,6 +69,7 @@ public class TaxiAction {
 		this.commRange = commRange;
 
 		this.rng = rng;
+		this.metric = metric;
 	}
 
 	/**
@@ -143,6 +146,7 @@ public class TaxiAction {
 		if (parcel.canBeDelivered(agent, time.getTime())
 				&& !pm.getVehicleState(agent).equals(VehicleState.DELIVERING)) {
 			pm.deliver(agent, parcel, time);
+			metric.passengerDelivered();
 		}
 
 	}

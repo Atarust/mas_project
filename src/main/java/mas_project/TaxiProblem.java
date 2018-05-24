@@ -121,6 +121,8 @@ public final class TaxiProblem {
       @Nullable Display display, @Nullable Monitor m, @Nullable Listener list) {
 
     final View.Builder view = createGui(testing, display, m, list);
+    
+    final Metric metric = new Metric();
 
     // use map of leuven
     final Simulator simulator = Simulator.builder()
@@ -141,7 +143,7 @@ public final class TaxiProblem {
     }
     for (int i = 0; i < NUM_TAXIS; i++) {
       simulator.register(new TaxiImplDetails(roadModel.getRandomPosition(rng),
-        TAXI_CAPACITY, rng));
+        TAXI_CAPACITY, rng, metric));
     }
     for (int i = 0; i < NUM_CUSTOMERS; i++) {
       simulator.register(new Customer(

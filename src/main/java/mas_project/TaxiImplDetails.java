@@ -34,12 +34,14 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 	private RoadModel rm;
 	private PDPModel pm;
 	private Optional<CommDevice> device;
+	private Metric metric;
 
 	private final IBDIAgent agent;
 
-	protected TaxiImplDetails(Point startPosition, int capacity, RandomGenerator rng) {
+	protected TaxiImplDetails(Point startPosition, int capacity, RandomGenerator rng, Metric metric) {
 		super(getAgent(startPosition, capacity));
 		this.rng = rng;
+		this.metric = metric;
 		agent = new BDIAgent(rng);
 	}
 
@@ -51,7 +53,7 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 	protected void tickImpl(TimeLapse time) {
 		rm = getRoadModel();
 		pm = getPDPModel();
-		final TaxiAction capabilities = new TaxiAction(this, rm, pm, device, rng, SPEED, SEE_RANGE, COMM_RANGE);
+		final TaxiAction capabilities = new TaxiAction(this, rm, pm, device, rng, metric, SPEED, SEE_RANGE, COMM_RANGE);
 
 		agent.updateBelief(capabilities, time);
 		agent.updateDesire(capabilities, time);
