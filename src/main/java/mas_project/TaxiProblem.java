@@ -139,7 +139,7 @@ public final class TaxiProblem {
 				return Parameter.GRAPH_CACHE.get(name);
 			}
 			final Graph<MultiAttributeData> g = DotGraphIO.getMultiAttributeGraphIO(Filters.selfCycleFilter())
-					.read(TaxiProblemParameterized.class.getResourceAsStream(name));
+					.read(TaxiProblem.class.getResourceAsStream(name));
 
 			Parameter.GRAPH_CACHE.put(name, g);
 			return g;

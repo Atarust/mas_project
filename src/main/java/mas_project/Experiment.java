@@ -22,7 +22,7 @@ public class Experiment {
 		
 		
 		for (Parameter exp : exps) {
-			Simulator sim = TaxiProblemParameterized.run(exp);
+			Simulator sim = TaxiProblem.run(exp);
 		}
 
 	}
