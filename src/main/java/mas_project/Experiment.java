@@ -59,11 +59,11 @@ public class Experiment {
 	public static void experimentStoppedListener(Metric metric) {
 		nrOfexpsRunning -= 1;
 
+		System.out.println((exps.size() - nrOfexpsRunning) + "/" + exps.size() + " finished");
+
 		if (nrOfexpsRunning == 0) {
 			allExperimentsAreFinished();
 		}
-		// simulation has stopped
-		System.out.println(metric.getResult());
 	}
 
 	/**
