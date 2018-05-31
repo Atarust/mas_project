@@ -1,11 +1,16 @@
 package mas_project;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.math3.random.RandomGenerator;
 
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
 import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
+import com.github.rinde.rinsim.core.model.pdp.Parcel;
 import com.github.rinde.rinsim.core.model.pdp.Vehicle;
 import com.github.rinde.rinsim.core.model.pdp.VehicleDTO;
 import com.github.rinde.rinsim.core.model.road.RoadModel;
@@ -35,6 +40,8 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 	private PDPModel pm;
 	private Optional<CommDevice> device;
 	private Metric metric;
+	
+	private Set<Parcel> allHistoricPassengers = new HashSet<>();
 
 	private final IBDIAgent agent;
 
@@ -45,17 +52,22 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 		this.SEE_RANGE = Parameter.seeRange;
 		this.COMM_RANGE = parameter.commRange;
 		this.commReliability = Parameter.commReliability;
-		agent = new BDIAgent(rng);
+		agent = new BDIAgent(rng, metric);
 	}
 
 	@Override
 	public void afterTick(TimeLapse timeLapse) {
-		System.out.println(metric.getResult());
+		//System.out.println(metric.getResult());
 	}
 
 	@Override
 	protected void tickImpl(TimeLapse time) {
 		rm = getRoadModel();
+		
+		// metric counts all passengers that ever existed
+		rm.getObjects().stream().filter(ru -> ru instanceof Parcel).forEach(ru -> allHistoricPassengers.add((Parcel) ru));
+		metric.passengerSpawned(allHistoricPassengers.size());
+		
 		pm = getPDPModel();
 		final TaxiAction capabilities = new TaxiAction(this, rm, pm, device, rng, metric, SPEED, SEE_RANGE, COMM_RANGE);
 		agent.updateBelief(capabilities, time);

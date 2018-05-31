@@ -53,4 +53,13 @@ public class Parameter {
 		this.commRange = commRange;
 		this.metric = metric;
 	}
+	
+	
+	@Override
+	public String toString() {
+		return "[runTime:" + runTime + "], "
+				+ "[commRange:" + commRange + "]";
+	}
+	
+	
 }

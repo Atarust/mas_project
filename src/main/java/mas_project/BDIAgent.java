@@ -63,12 +63,19 @@ public class BDIAgent implements IBDIAgent {
 	@Override
 	public void updateBelief(TaxiAction action, TimeLapse time) {
 		knownObjects.putAll(action.see());
+		
+		// I need to remove the old parcels twice, because of the metric measurement.
+		oldParcels.stream().forEach(oldPassenger -> knownObjects.remove(oldPassenger));
+		oldParcels.stream().forEach(oldPassenger -> claimedParcels.remove(oldPassenger));
 
+		int nrParcelsBeforeComm = knownObjects.size();
 		// broadcast all knowledge
 		knownObjects.entrySet().stream().forEach(entry -> action.broadcastNewObject(entry.getKey(), entry.getValue()));
 		processMessages(action.readMessages());
+		metric.newParcelCommunicated(nrParcelsBeforeComm - knownObjects.size());
 		oldParcels.stream().forEach(oldPassenger -> knownObjects.remove(oldPassenger));
 		oldParcels.stream().forEach(oldPassenger -> claimedParcels.remove(oldPassenger));
+		metric.newParcelsKnown(knownObjects.keySet().stream().filter(ru -> ru instanceof Parcel).count());
 	}
 
 	@Override
@@ -88,6 +95,7 @@ public class BDIAgent implements IBDIAgent {
 
 	@Override
 	public void updateIntention(TaxiAction action, TimeLapse time) {
+		boolean isIdleAtBeginning = state == State.idle;
 		while (time.hasTimeLeft()) {
 			switch (state) {
 			case idle:
@@ -152,6 +160,10 @@ public class BDIAgent implements IBDIAgent {
 			default:
 				throw new RuntimeException("Error, Illegal state!");
 			}
+		}
+		metric.countTick();
+		if (isIdleAtBeginning && state == State.idle) {
+			metric.spentIdle();
 		}
 	}
 

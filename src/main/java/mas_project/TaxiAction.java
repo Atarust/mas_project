@@ -200,6 +200,7 @@ public class TaxiAction {
 	public void broadcastNewObject(RoadUser obj, Point point) {
 		// TODO make sure to broadcast not to oneself!
 		device.get().broadcast(new ObjectPosition(obj, point), commRange);
+		metric.messageSent();
 	}
 
 	/**
