@@ -27,9 +27,9 @@ import com.google.common.base.Optional;
 public class TaxiImplDetails extends Vehicle implements CommUser {
 
 	private static final double SPEED = 30000d;
-	private static final double SEE_RANGE = 13370;
-	private static final double COMM_RANGE = 13370;
-	private final double commReliability = 1;
+	private final double SEE_RANGE;
+	private final double COMM_RANGE;
+	private final double commReliability;
 	private final RandomGenerator rng;
 	private RoadModel rm;
 	private PDPModel pm;
@@ -38,15 +38,19 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 
 	private final IBDIAgent agent;
 
-	protected TaxiImplDetails(Point startPosition, int capacity, RandomGenerator rng, Metric metric) {
-		super(getAgent(startPosition, capacity));
+	protected TaxiImplDetails(Parameter parameter, Point startPosition, RandomGenerator rng) {
+		super(getAgent(startPosition, Parameter.MAX_CAPACITY));
 		this.rng = rng;
-		this.metric = metric;
+		this.metric = parameter.metric;
+		this.SEE_RANGE = Parameter.seeRange;
+		this.COMM_RANGE = parameter.commRange;
+		this.commReliability = Parameter.commReliability;
 		agent = new BDIAgent(rng);
 	}
 
 	@Override
 	public void afterTick(TimeLapse timeLapse) {
+		System.out.println(metric.getResult());
 	}
 
 	@Override

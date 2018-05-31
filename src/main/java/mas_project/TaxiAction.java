@@ -55,7 +55,7 @@ public class TaxiAction {
 	 * @param rm
 	 * @param pm
 	 * @param rng
-	 * @param metric 
+	 * @param metric
 	 * @param speed
 	 * @param seeRange
 	 */
@@ -237,7 +237,7 @@ public class TaxiAction {
 			return new HashSet<>();
 		}
 	}
-	
+
 	public ParcelState getParcelState(Parcel p) {
 		return pm.getParcelState(p);
 	}
