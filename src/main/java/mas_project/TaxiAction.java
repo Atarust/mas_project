@@ -144,13 +144,11 @@ public class TaxiAction {
 		if (!isInCargo(parcel)) {
 			System.out.println("Error, Lost cargo!!");
 		}
-
 		if (parcel.canBeDelivered(agent, time.getTime())
 				&& !pm.getVehicleState(agent).equals(VehicleState.DELIVERING)) {
 			pm.deliver(agent, parcel, time);
 			metric.passengerDelivered();
 		}
-
 	}
 
 	/**
@@ -212,7 +210,6 @@ public class TaxiAction {
 	public void broadcastReservation(Parcel passenger) {
 		// TODO make sure to broadcast not to oneself!
 		if (device.isPresent()) {
-			System.out.println("broadcasting...");
 			device.get().broadcast(new Reservation(passenger), commRange);
 		}
 	}

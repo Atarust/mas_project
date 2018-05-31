@@ -15,11 +15,8 @@
  */
 package mas_project;
 
-import static com.google.common.collect.Maps.newHashMap;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -46,7 +43,6 @@ import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.geom.io.DotGraphIO;
 import com.github.rinde.rinsim.geom.io.Filters;
 import com.github.rinde.rinsim.ui.View;
-import com.github.rinde.rinsim.ui.renderers.CommRenderer;
 import com.github.rinde.rinsim.ui.renderers.GraphRoadModelRenderer;
 import com.github.rinde.rinsim.ui.renderers.RoadUserRenderer;
 

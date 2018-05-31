@@ -71,6 +71,7 @@ public class BDIAgent implements IBDIAgent {
 
 	@Override
 	public void updateDesire(TaxiAction action, TimeLapse time) {
+		//System.out.println("I am " + state + (!passenger.isPresent()));
 		if (state == State.idle && !passenger.isPresent()) {
 			Set<RoadUser> passengers = knownObjects.keySet().stream().filter(obj -> obj instanceof Parcel)
 					.filter(obj -> !claimedParcels.contains(obj)).collect(Collectors.toSet());

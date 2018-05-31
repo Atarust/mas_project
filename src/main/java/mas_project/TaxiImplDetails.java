@@ -54,7 +54,6 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 		rm = getRoadModel();
 		pm = getPDPModel();
 		final TaxiAction capabilities = new TaxiAction(this, rm, pm, device, rng, metric, SPEED, SEE_RANGE, COMM_RANGE);
-
 		agent.updateBelief(capabilities, time);
 		agent.updateDesire(capabilities, time);
 		agent.updateIntention(capabilities, time);
