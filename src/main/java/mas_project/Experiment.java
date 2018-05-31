@@ -19,13 +19,13 @@ public class Experiment {
 		// set parameters
 		exps = new LinkedList<>();
 
-		List<Integer> runTimeInterval = Arrays.asList(new Integer[] { 1000 * 5000 });
+		List<Integer> runTimeInterval = Arrays.asList(new Integer[] { 1000 * 2000 });
 		List<Integer> commRangeInterval = Arrays.asList(new Integer[] { 10, 100 * 10000 });
 		List<Double> commReliabilityInterval = Arrays.asList(new Double[] { 1.0 });
-		List<Integer> numTaxisInterval = Arrays.asList(new Integer[] { 20 });
-		List<Integer> numCustomersInterval = Arrays.asList(new Integer[] { 50 });
-		List<Double> newCustomerProbInterval = Arrays.asList(new Double[] { 0.1 });
-		List<Integer> seeRangeInterval = Arrays.asList(new Integer[] { 10 });
+		List<Integer> numTaxisInterval = Arrays.asList(new Integer[] { 10});
+		List<Integer> numCustomersInterval = Arrays.asList(new Integer[] { 5 });
+		List<Double> newCustomerProbInterval = Arrays.asList(new Double[] {  0.0201});
+		List<Integer> seeRangeInterval = Arrays.asList(new Integer[] { 1000,1001});
 
 		for (int runTime : runTimeInterval) {
 			for (int commRange : commRangeInterval) {
