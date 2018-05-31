@@ -199,6 +199,11 @@ public class BDIAgent implements IBDIAgent {
 			claimedParcels.remove(parcelToForget);
 		});
 	}
+	
+	@Override
+	public String toString() {
+		return "" + this.state + ", lazy=" + this.lazyTaxi + ", know=" + knownObjects.keySet().stream().filter(ru -> ru instanceof Parcel).count();
+	}
 
 	static enum State {
 		idle, goto_parcel, pickup, goto_dest, deliver;

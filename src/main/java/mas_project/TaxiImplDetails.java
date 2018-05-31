@@ -95,5 +95,10 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 		}
 		device = Optional.of(builder.setReliability(commReliability).build());
 	}
+	
+	@Override
+	public String toString() {
+		return agent.toString();
+	}
 
 }
