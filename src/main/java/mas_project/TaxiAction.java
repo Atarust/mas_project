@@ -15,6 +15,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
 import com.github.rinde.rinsim.core.model.comm.MessageContents;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
+import com.github.rinde.rinsim.core.model.pdp.PDPModel.ParcelState;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel.VehicleState;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
 import com.github.rinde.rinsim.core.model.pdp.Vehicle;
@@ -89,6 +90,7 @@ public class TaxiAction {
 	 * @param time
 	 */
 	public void pickUp(Parcel parcel, TimeLapse time) {
+		// pickup needs to be called only once. Then just wait until it is picked up.
 		if (isOnRoad(parcel)) {
 			pm.pickup(agent, parcel, time);
 		}
@@ -237,6 +239,10 @@ public class TaxiAction {
 		} else {
 			return new HashSet<>();
 		}
+	}
+	
+	public ParcelState getParcelState(Parcel p) {
+		return pm.getParcelState(p);
 	}
 
 	public static <T> T getRandomElement(Collection<T> passengers, RandomGenerator rng) {

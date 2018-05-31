@@ -10,6 +10,7 @@ import org.apache.commons.math3.random.RandomGenerator;
 
 import com.github.rinde.rinsim.core.model.comm.MessageContents;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
+import com.github.rinde.rinsim.core.model.pdp.PDPModel.ParcelState;
 import com.github.rinde.rinsim.core.model.road.RoadUser;
 import com.github.rinde.rinsim.core.model.time.TimeLapse;
 import com.github.rinde.rinsim.geom.Point;
@@ -79,11 +80,6 @@ public class BDIAgent implements IBDIAgent {
 				state = State.goto_parcel;
 				state.log();
 			}
-			if (passenger.isPresent() && !action.isInCargo(passenger.get()) && !action.isOnRoad(passenger.get())) {
-				passenger = Optional.absent();
-				System.out.println(
-						"warning: Passenger is neither in roadmap nor in cargo. Ain't nobody got time to search him!");
-			}
 		}
 	}
 
@@ -100,17 +96,17 @@ public class BDIAgent implements IBDIAgent {
 				} else {
 					randomPosition = Optional.of(action.randomPosition());
 				}
-
 				break;
 			case goto_parcel:
-				if (passenger.isPresent()) {
+				if (passenger.isPresent() && action.isOnRoad(passenger.get()) && action.getParcelState(passenger.get()) == ParcelState.AVAILABLE) {
 					action.goTo(passenger.get().getPickupLocation(), time);
 					if (action.isAt(passenger.get().getPickupLocation())) {
 						state = State.pickup;
 						state.log();
 					}
 				} else {
-					System.out.println("that shitty passenger seems to have disappeared.");
+					// Passenger not available anymore. Pickup by someone else maybe.
+					passenger = Optional.absent();
 					state = State.idle;
 					state.log();
 				}
@@ -121,9 +117,11 @@ public class BDIAgent implements IBDIAgent {
 					if (action.isInCargo(passenger.get())) {
 						state = State.goto_dest;
 						state.log();
+					} else if(action.hasEmptyCargo() && action.getParcelState(passenger.get()) != ParcelState.PICKING_UP) {
+						// Parcel is neither on roadmap, nor in cargo and it also doesn't pick up atm. Strange.
+						// Only during Pickup, cargo is empty and parcel is off the road.
+						forgetPassenger(action);
 					}
-					// TODO: If one agent is picking up a passenger and the other agent reaches
-					// that at the same time, they stall.
 				} else {
 					throw new RuntimeException(
 							"Can not deliver, because not at right position. This should NEVER happen");
@@ -143,9 +141,7 @@ public class BDIAgent implements IBDIAgent {
 					System.out.println("Warning: Parcel was not in cargo anymore. idc lol");
 				}
 				if (action.hasEmptyCargo()) {
-					action.broadcastUnreservation(passenger.get());
-					oldParcels.add(passenger.get());
-					passenger = Optional.absent();
+					forgetPassenger(action);
 					state = State.idle;
 					state.log();
 				}
@@ -154,6 +150,12 @@ public class BDIAgent implements IBDIAgent {
 				throw new RuntimeException("Error, Illegal state!");
 			}
 		}
+	}
+
+	private void forgetPassenger(TaxiAction action) {
+		action.broadcastUnreservation(passenger.get());
+		oldParcels.add(passenger.get());
+		passenger = Optional.absent();
 	}
 
 	private void processMessages(Set<MessageContents> messages) {
