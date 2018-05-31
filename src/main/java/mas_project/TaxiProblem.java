@@ -64,10 +64,20 @@ public final class TaxiProblem {
 
 		final View.Builder view = createGui(Parameter.testing, Parameter.display, Parameter.m, Parameter.list);
 
-		// use map of leuven
-		final Simulator simulator = Simulator.builder().addModel(RoadModelBuilders.staticGraph(loadGraph(Parameter.graphFile)))
-				.addModel(DefaultPDPModel.builder()).addModel(CommModel.builder()).setRandomSeed(Parameter.RANDOM_SEED)
-				.addModel(view).build();
+		final Simulator simulator;
+		if (Parameter.gui) {
+			simulator = Simulator.builder()
+					.addModel(RoadModelBuilders.staticGraph(loadGraph(Parameter.graphFile)))
+					.addModel(DefaultPDPModel.builder()).addModel(CommModel.builder())
+					.setRandomSeed(Parameter.RANDOM_SEED).addModel(view).build();
+		} else {
+			simulator = Simulator.builder()
+					.addModel(RoadModelBuilders.staticGraph(loadGraph(Parameter.graphFile)))
+					.addModel(DefaultPDPModel.builder()).addModel(CommModel.builder())
+					.setRandomSeed(Parameter.RANDOM_SEED)
+					// .addModel(view)
+					.build();
+		}
 		final RandomGenerator rng = simulator.getRandomGenerator();
 
 		final RoadModel roadModel = simulator.getModelProvider().getModel(RoadModel.class);

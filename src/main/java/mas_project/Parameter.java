@@ -46,6 +46,7 @@ public class Parameter {
 	public static final long RANDOM_SEED = 42L;
 	public static final double seeRange = 13370;
 	public static final double commReliability = 1;
+	public static final boolean gui = false;
 
 	public Parameter(long runTime, int commRange, Metric metric) {
 		this.runTime = runTime;

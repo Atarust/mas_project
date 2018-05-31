@@ -40,12 +40,14 @@ public class BDIAgent implements IBDIAgent {
 	Optional<Parcel> passenger;
 	Optional<Point> randomPosition;
 	RandomGenerator rng;
+	Metric metric;
 
 	State state;
 	private static final boolean LOG_STATE = false;
 
-	public BDIAgent(RandomGenerator rng) {
+	public BDIAgent(RandomGenerator rng, Metric metric) {
 		this.rng = rng;
+		this.metric = metric;
 
 		// Beliefs/Desires
 		knownObjects = new HashMap<>();
