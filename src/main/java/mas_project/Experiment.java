@@ -34,8 +34,11 @@ public class Experiment {
 						for (int numCustomers : numCustomersInterval) {
 							for (double newCustomerProb : newCustomerProbInterval) {
 								for (int seeRange : seeRangeInterval) {
-									exps.add(new Parameter(runTime, commRange, commReliability, numTaxis, numCustomers,
-											newCustomerProb, seeRange, new Metric()));
+									Parameter p = new Parameter(runTime, commRange, commReliability, numTaxis, numCustomers,
+											newCustomerProb, seeRange, new Metric());
+									p.withGui(false);
+									p.withTesting(true);
+									exps.add(p);
 								}
 							}
 						}
