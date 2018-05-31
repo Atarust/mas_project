@@ -66,6 +66,18 @@ public class Parameter {
 
 	}
 
+	public static Parameter defaultParameter() {
+		int runTime = 1000*1000;
+		int commRange = 100;
+		double commReliability = 1;
+		int numTaxis = 20;
+		int numCustomers = 20;
+		double newCustomerProb = 0.05;
+		int seeRange = 2000;
+		Metric metric = new Metric();
+		return new Parameter(runTime, commRange, commReliability, numTaxis, numCustomers, newCustomerProb, seeRange, metric);
+	}
+
 	public static String csvHeader() {
 		return "runTime,commRange,commReliability,numTaxis,numCustomers,newCustomerProb,seeRange," + Metric.csvHeader();
 	}
