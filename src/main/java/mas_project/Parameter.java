@@ -25,6 +25,9 @@ public class Parameter {
 
 	public final Metric metric;
 
+	public boolean testing = false;
+	public boolean gui = false;
+	
 	// Useless parameters
 	// time in ms
 
@@ -33,7 +36,6 @@ public class Parameter {
 	public static final Monitor m = null;
 	public static final Listener list = null;
 	public static final String graphFile = "/data/maps/leuven-simple.dot";
-	public static final boolean testing = true;
 
 	public static final long SERVICE_DURATION = 60000;
 	public static final int TAXI_CAPACITY = 1;
@@ -48,8 +50,7 @@ public class Parameter {
 	public static final long TEST_STOP_TIME = 20 * 60 * 1000;
 	public static final int TEST_SPEED_UP = 64;
 
-	public static final long RANDOM_SEED = 42L;
-	public static final boolean gui = false;
+	public final long RANDOM_SEED = 42L + System.currentTimeMillis();
 
 	public Parameter(long runTime, int commRange, double commReliability, int numTaxis, int numCustomers,
 			double newCustomerProb, int seeRange, Metric metric) {
@@ -84,5 +85,15 @@ public class Parameter {
 		}
 		return csv;
 	}
+	
+	public void withGui(boolean guiOn) {
+		gui = guiOn;
+	}
+	
+	public void withTesting(boolean testingOn) {
+		testing = testingOn;
+	}
+	
+	
 
 }

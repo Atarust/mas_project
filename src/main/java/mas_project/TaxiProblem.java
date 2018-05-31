@@ -43,6 +43,7 @@ import com.github.rinde.rinsim.geom.Point;
 import com.github.rinde.rinsim.geom.io.DotGraphIO;
 import com.github.rinde.rinsim.geom.io.Filters;
 import com.github.rinde.rinsim.ui.View;
+import com.github.rinde.rinsim.ui.renderers.CommRenderer;
 import com.github.rinde.rinsim.ui.renderers.GraphRoadModelRenderer;
 import com.github.rinde.rinsim.ui.renderers.RoadUserRenderer;
 
@@ -60,21 +61,28 @@ public final class TaxiProblem {
 	private TaxiProblem() {
 	}
 	
+	public static void main(String[] args) {
+		Parameter p = Parameter.defaultParameter();
+		p.withGui(true);
+		p.withTesting(false);
+		run(p);
+	}
+	
 	public static Simulator run(Parameter parameter) {
 
-		final View.Builder view = createGui(Parameter.testing, Parameter.display, Parameter.m, Parameter.list);
+		final View.Builder view = createGui(parameter.testing, Parameter.display, Parameter.m, Parameter.list);
 
 		final Simulator simulator;
-		if (Parameter.gui) {
+		if (parameter.gui) {
 			simulator = Simulator.builder()
 					.addModel(RoadModelBuilders.staticGraph(loadGraph(Parameter.graphFile)))
 					.addModel(DefaultPDPModel.builder()).addModel(CommModel.builder())
-					.setRandomSeed(Parameter.RANDOM_SEED).addModel(view).build();
+					.setRandomSeed(parameter.RANDOM_SEED).addModel(view).build();
 		} else {
 			simulator = Simulator.builder()
 					.addModel(RoadModelBuilders.staticGraph(loadGraph(Parameter.graphFile)))
 					.addModel(DefaultPDPModel.builder()).addModel(CommModel.builder())
-					.setRandomSeed(Parameter.RANDOM_SEED)
+					.setRandomSeed(parameter.RANDOM_SEED)
 					// .addModel(view)
 					.build();
 		}
@@ -126,11 +134,11 @@ public final class TaxiProblem {
 						.withImageAssociation(TaxiImplDetails.class, "/graphics/flat/taxi-32.png")
 						.withImageAssociation(Customer.class, "/graphics/flat/person-red-32.png"))
 				// .with(TaxiRenderer.builder(Language.ENGLISH))
-				.withTitleAppendix("Taxi Demo");
-		// .with(CommRenderer.builder()
-		// .withReliabilityColors()
-		// .withToString()
-		// .withMessageCount());
+				.withTitleAppendix("Taxi Demo")
+		 .with(CommRenderer.builder()
+		 .withReliabilityColors()
+		 .withToString()
+		 .withMessageCount());
 
 		if (testing) {
 			view = view.withAutoClose().withAutoPlay().withSimulatorEndTime(Parameter.TEST_STOP_TIME).withSpeedUp(Parameter.TEST_SPEED_UP);
