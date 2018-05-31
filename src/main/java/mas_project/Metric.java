@@ -1,5 +1,6 @@
 package mas_project;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class Metric {
 	private int ticksSpentIdle;
 	private int ticks;
 	private List<Long> numParcelsKnownPerTick;
+	private double numParcelsKnownPerTickAverage;
 
 	public Metric() {
 		passengersDelivered = 0;
@@ -53,6 +55,7 @@ public class Metric {
 
 	public void newParcelsKnown(long l) {
 		numParcelsKnownPerTick.add(l);
+		numParcelsKnownPerTickAverage = numParcelsKnownPerTick.stream().mapToDouble(a -> a).average().orElse(-1);
 	}
 
 	public int getResult() {
@@ -62,12 +65,19 @@ public class Metric {
 
 	@Override
 	public String toString() {
-		double numParcelsKnownPerTickAverage = numParcelsKnownPerTick.stream().mapToDouble(a -> a).average().orElse(-1);
-
 		return "[passengersDelivered:" + passengersDelivered + "]" + "[passengersSpawned:" + passengersSpawned + "]"
 				+ "[numMessagesSent:" + numMessagesSent + "]" + "[numNewParcelsComm:" + numNewParcelsComm + "]"
 				+ "[ticksSpentIdle:" + ticksSpentIdle + "]" + "[ticks:" + ticks + "]" + "[numParcelsKnown:"
 				+ numParcelsKnownPerTickAverage + "]";
+	}
+
+	public static String csvHeader() {
+		return "passengersDelivered,passengersSpawned,numMessagesSent,numNewParcelsComm,ticksSpentIdle,ticks,numParcelsKnownPerTickAverage";
+	}
+
+	public List<Object> toCSV() {
+		return Arrays.asList(new Object[] { passengersDelivered, passengersSpawned, numMessagesSent, numNewParcelsComm, ticksSpentIdle,
+				ticks, numParcelsKnownPerTickAverage });
 	}
 
 }

@@ -1,5 +1,10 @@
 package mas_project;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,8 +48,26 @@ public class Experiment {
 	 * Is called, when all experiments have finished. Now start processing the data
 	 */
 	private static void allExperimentsAreFinished() {
-		for(Parameter exp : exps) {
-			System.out.println(exp.toString() + exp.metric);
+		// save results to csv
+		String content = Parameter.csvHeader() + "\n";
+		for (Parameter exp : exps) {
+			content += Parameter.listToCSV(exp.toCSV()) + "\n";
+		}
+		writeToCSV(content, "filename");
+		
+		System.out.println("DONE.");
+	}
+	
+	private static void writeToCSV(String content, String filename) {
+		// Get the file reference
+		Path path = Paths.get("results/" + filename + ".csv");
+
+		// Use try-with-resource to get auto-closeable writer instance
+		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+			writer.write(content);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

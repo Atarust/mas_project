@@ -2,6 +2,9 @@ package mas_project;
 
 import static com.google.common.collect.Maps.newHashMap;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.widgets.Display;
@@ -53,13 +56,29 @@ public class Parameter {
 		this.commRange = commRange;
 		this.metric = metric;
 	}
-	
-	
+
 	@Override
 	public String toString() {
-		return "[runTime:" + runTime + "], "
-				+ "[commRange:" + commRange + "]";
+		return "[runTime:" + runTime + "], " + "[commRange:" + commRange + "]";
 	}
-	
-	
+
+	public static String csvHeader() {
+		return "runTime,commRange," + Metric.csvHeader();
+	}
+
+	public List<Object> toCSV() {
+		// Needs Arraylist to be able to addAll
+		List<Object> objects = new ArrayList<>(Arrays.asList(new Object[] {runTime, commRange}));
+		objects.addAll(metric.toCSV());
+		return objects;
+	}
+
+	public static String listToCSV(List<Object> objects) {
+		String csv = "";
+		for (Object el : objects) {
+			csv += el + ",";
+		}
+		return csv;
+	}
+
 }
