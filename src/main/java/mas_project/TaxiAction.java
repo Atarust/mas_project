@@ -94,7 +94,7 @@ public class TaxiAction {
 		if (isOnRoad(parcel)) {
 			pm.pickup(agent, parcel, time);
 		}
-		metric.parcelWaitingTime(parcel.getDeliveryTimeWindow().begin() - time.getTime(), parcel);
+		metric.parcelWaitingTime(time.getTime() - parcel.getOrderAnnounceTime(), parcel);
 	}
 
 	/**
