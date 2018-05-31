@@ -51,7 +51,7 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 		this.metric = parameter.metric;
 		this.SEE_RANGE = Parameter.seeRange;
 		this.COMM_RANGE = parameter.commRange;
-		this.commReliability = Parameter.commReliability;
+		this.commReliability = parameter.commReliability;
 		agent = new BDIAgent(rng, metric);
 	}
 

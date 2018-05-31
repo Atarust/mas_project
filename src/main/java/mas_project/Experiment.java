@@ -18,8 +18,17 @@ public class Experiment {
 		// set parameters
 		exps = new LinkedList<>();
 
+		int runTime = 1000 * 1000;
+		int commRange = 1000;
+		double commReliability = 1;
+		int numTaxis = 10;
+		int numCustomers = 20;
+		double newCustomerProb = 0.04;
+		int seeRange = 13370;
+		
 		for (int commR = 0; commR < 10; commR++) {
-			exps.add(new Parameter(1000 * 1000, 1 + 100*commR, new Metric()));
+			commRange = 1 + 100 * commR;
+			exps.add(new Parameter(runTime, commRange, commReliability, numTaxis, numCustomers, newCustomerProb, seeRange, new Metric()));
 		}
 
 		nrOfexpsRunning = exps.size();

@@ -85,10 +85,10 @@ public final class TaxiProblem {
 		for (int i = 0; i < Parameter.NUM_DEPOTS; i++) {
 			simulator.register(new TaxiBase(roadModel.getRandomPosition(rng), Parameter.DEPOT_CAPACITY));
 		}
-		for (int i = 0; i < Parameter.NUM_TAXIS; i++) {
+		for (int i = 0; i < parameter.numTaxis; i++) {
 			simulator.register(new TaxiImplDetails(parameter, roadModel.getRandomPosition(rng), rng));
 		}
-		for (int i = 0; i < Parameter.NUM_CUSTUMORS; i++) {
+		for (int i = 0; i < parameter.numCustomers; i++) {
 			simulator.register(new Customer(Parcel
 					.builder(roadModel.getRandomPosition(rng), roadModel.getRandomPosition(rng))
 					.serviceDuration(Parameter.SERVICE_DURATION).neededCapacity(1 + rng.nextInt(Parameter.MAX_CAPACITY)).buildDTO()));
@@ -100,7 +100,7 @@ public final class TaxiProblem {
 				if (time.getStartTime() > parameter.runTime) {
 					simulator.stop();
 					Experiment.experimentStoppedListener(parameter.metric);
-				} else if (rng.nextDouble() < Parameter.NEW_CUSTOMER_PROB) {
+				} else if (rng.nextDouble() < parameter.newCustomerProb) {
 					simulator.register(new Customer(
 							Parcel.builder(roadModel.getRandomPosition(rng), roadModel.getRandomPosition(rng))
 									.serviceDuration(Parameter.SERVICE_DURATION).neededCapacity(1 + rng.nextInt(Parameter.MAX_CAPACITY))
