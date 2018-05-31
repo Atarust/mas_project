@@ -41,6 +41,7 @@ public class BDIAgent implements IBDIAgent {
 	Optional<Point> randomPosition;
 	RandomGenerator rng;
 	Metric metric;
+	boolean lazyTaxi;
 
 	State state;
 	private static final boolean LOG_STATE = false;
@@ -49,6 +50,7 @@ public class BDIAgent implements IBDIAgent {
 		this.rng = rng;
 		this.metric = metric;
 
+		this.lazyTaxi = rng.nextDouble() < 0.5;
 		// Beliefs/Desires
 		knownObjects = new HashMap<>();
 		claimedParcels = new HashSet<>();
@@ -80,11 +82,11 @@ public class BDIAgent implements IBDIAgent {
 
 	@Override
 	public void updateDesire(TaxiAction action, TimeLapse time) {
-		//System.out.println("I am " + state + (!passenger.isPresent()));
+		// System.out.println("I am " + state + (!passenger.isPresent()));
 		if (state == State.idle && !passenger.isPresent()) {
 			Set<RoadUser> passengers = knownObjects.keySet().stream().filter(obj -> obj instanceof Parcel)
 					.filter(obj -> !claimedParcels.contains(obj)).collect(Collectors.toSet());
-			if (!passengers.isEmpty()) {
+			if (!passengers.isEmpty() && !this.lazyTaxi) {
 				passenger = Optional.of((Parcel) TaxiAction.getRandomElement(passengers, rng));
 				action.broadcastReservation(passenger.get());
 				state = State.goto_parcel;
@@ -96,6 +98,9 @@ public class BDIAgent implements IBDIAgent {
 	@Override
 	public void updateIntention(TaxiAction action, TimeLapse time) {
 		boolean isIdleAtBeginning = state == State.idle;
+		if (this.lazyTaxi) {
+			state = State.idle;
+		}
 		while (time.hasTimeLeft()) {
 			switch (state) {
 			case idle:
@@ -106,6 +111,9 @@ public class BDIAgent implements IBDIAgent {
 					action.goTo(randomPosition.get(), time);
 				} else {
 					randomPosition = Optional.of(action.randomPosition());
+				}
+				if (this.lazyTaxi) {
+					state = State.idle;
 				}
 				break;
 			case goto_parcel:
