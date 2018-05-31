@@ -46,11 +46,11 @@ public class BDIAgent implements IBDIAgent {
 	State state;
 	private static final boolean LOG_STATE = false;
 
-	public BDIAgent(RandomGenerator rng, Metric metric) {
+	public BDIAgent(RandomGenerator rng, Metric metric, double lazyProb) {
 		this.rng = rng;
 		this.metric = metric;
 
-		this.lazyTaxi = rng.nextDouble() < 0.5;
+		this.lazyTaxi = rng.nextDouble() < lazyProb;
 		// Beliefs/Desires
 		knownObjects = new HashMap<>();
 		claimedParcels = new HashSet<>();

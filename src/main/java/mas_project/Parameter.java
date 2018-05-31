@@ -22,6 +22,7 @@ public class Parameter {
 	public final int numCustomers;
 	public final double newCustomerProb;
 	public final int seeRange;
+	public final double lazyProb;
 
 	public final Metric metric;
 
@@ -53,7 +54,7 @@ public class Parameter {
 	public final long RANDOM_SEED = 42L + System.currentTimeMillis();
 
 	public Parameter(long runTime, int commRange, double commReliability, int numTaxis, int numCustomers,
-			double newCustomerProb, int seeRange, Metric metric) {
+			double newCustomerProb, int seeRange, double lazyProb, Metric metric) {
 		this.runTime = runTime;
 		this.commRange = commRange;
 		this.commReliability = commReliability;
@@ -61,7 +62,8 @@ public class Parameter {
 		this.numCustomers = numCustomers;
 		this.newCustomerProb = newCustomerProb;
 		this.seeRange = seeRange;
-
+		this.lazyProb = lazyProb;
+		
 		this.metric = metric;
 
 	}
@@ -74,18 +76,19 @@ public class Parameter {
 		int numCustomers = 20;
 		double newCustomerProb = 0.05;
 		int seeRange = 2000;
+		double lazyProb = 0.1;
 		Metric metric = new Metric();
-		return new Parameter(runTime, commRange, commReliability, numTaxis, numCustomers, newCustomerProb, seeRange, metric);
+		return new Parameter(runTime, commRange, commReliability, numTaxis, numCustomers, newCustomerProb, seeRange, lazyProb, metric);
 	}
 
 	public static String csvHeader() {
-		return "runTime,commRange,commReliability,numTaxis,numCustomers,newCustomerProb,seeRange," + Metric.csvHeader();
+		return "runTime,commRange,commReliability,numTaxis,numCustomers,newCustomerProb,seeRange,lazyProb," + Metric.csvHeader();
 	}
 
 	public List<Object> toCSV() {
 		// Needs Arraylist to be able to addAll
 		List<Object> objects = new ArrayList<>(Arrays.asList(new Object[] { runTime, commRange, commReliability,
-				numTaxis, numCustomers, newCustomerProb, seeRange }));
+				numTaxis, numCustomers, newCustomerProb, seeRange, lazyProb,}));
 		objects.addAll(metric.toCSV());
 		return objects;
 	}

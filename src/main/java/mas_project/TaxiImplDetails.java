@@ -53,27 +53,28 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 		this.SEE_RANGE = parameter.seeRange;
 		this.COMM_RANGE = parameter.commRange;
 		this.commReliability = parameter.commReliability;
-		agent = new BDIAgent(rng, metric);
+		agent = new BDIAgent(rng, metric, parameter.lazyProb);
 	}
 
 	@Override
 	public void afterTick(TimeLapse timeLapse) {
-		//System.out.println(metric.getResult());
 	}
 
 	@Override
 	protected void tickImpl(TimeLapse time) {
 		rm = getRoadModel();
+		pm = getPDPModel();
 		
 		// metric counts all passengers that ever existed
-		rm.getObjects().stream().filter(ru -> ru instanceof Parcel).forEach(ru -> allHistoricPassengers.add((Parcel) ru));
+		rm.getObjects().stream().filter(ru -> ru instanceof Parcel)
+				.forEach(ru -> allHistoricPassengers.add((Parcel) ru));
 		metric.passengerSpawned(allHistoricPassengers.size());
 		
-		pm = getPDPModel();
 		final TaxiAction capabilities = new TaxiAction(this, rm, pm, device, rng, metric, SPEED, SEE_RANGE, COMM_RANGE);
 		agent.updateBelief(capabilities, time);
 		agent.updateDesire(capabilities, time);
 		agent.updateIntention(capabilities, time);
+
 	}
 
 	private static VehicleDTO getAgent(Point startPosition, int capacity) {

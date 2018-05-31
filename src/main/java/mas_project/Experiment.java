@@ -24,8 +24,9 @@ public class Experiment {
 		List<Double> commReliabilityInterval = Arrays.asList(new Double[] { 1.0 });
 		List<Integer> numTaxisInterval = Arrays.asList(new Integer[] { 10});
 		List<Integer> numCustomersInterval = Arrays.asList(new Integer[] { 5 });
-		List<Double> newCustomerProbInterval = Arrays.asList(new Double[] {  0.0201});
-		List<Integer> seeRangeInterval = Arrays.asList(new Integer[] { 1000,1001});
+		List<Double> newCustomerProbInterval = Arrays.asList(new Double[] { 0.02 });
+		List<Integer> seeRangeInterval = Arrays.asList(new Integer[] { 1000 });
+		List<Double> lazyProbInterval = Arrays.asList(new Double[] { 0.1 });
 
 		for (int runTime : runTimeInterval) {
 			for (int commRange : commRangeInterval) {
@@ -34,11 +35,13 @@ public class Experiment {
 						for (int numCustomers : numCustomersInterval) {
 							for (double newCustomerProb : newCustomerProbInterval) {
 								for (int seeRange : seeRangeInterval) {
-									Parameter p = new Parameter(runTime, commRange, commReliability, numTaxis, numCustomers,
-											newCustomerProb, seeRange, new Metric());
-									p.withGui(false);
-									p.withTesting(true);
-									exps.add(p);
+									for (double lazyProb : lazyProbInterval) {
+										Parameter p = new Parameter(runTime, commRange, commReliability, numTaxis,
+												numCustomers, newCustomerProb, seeRange, lazyProb, new Metric());
+										p.withGui(false);
+										p.withTesting(true);
+										exps.add(p);
+									}
 								}
 							}
 						}
