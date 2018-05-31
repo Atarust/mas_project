@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,17 +19,29 @@ public class Experiment {
 		// set parameters
 		exps = new LinkedList<>();
 
-		int runTime = 1000 * 1000;
-		int commRange = 1000;
-		double commReliability = 1;
-		int numTaxis = 10;
-		int numCustomers = 20;
-		double newCustomerProb = 0.04;
-		int seeRange = 13370;
-		
-		for (int commR = 0; commR < 10; commR++) {
-			commRange = 1 + 100 * commR;
-			exps.add(new Parameter(runTime, commRange, commReliability, numTaxis, numCustomers, newCustomerProb, seeRange, new Metric()));
+		List<Integer> runTimeInterval = Arrays.asList(new Integer[] { 1000 * 5000 });
+		List<Integer> commRangeInterval = Arrays.asList(new Integer[] { 10, 100 * 10000 });
+		List<Double> commReliabilityInterval = Arrays.asList(new Double[] { 1.0 });
+		List<Integer> numTaxisInterval = Arrays.asList(new Integer[] { 20 });
+		List<Integer> numCustomersInterval = Arrays.asList(new Integer[] { 50 });
+		List<Double> newCustomerProbInterval = Arrays.asList(new Double[] { 0.1 });
+		List<Integer> seeRangeInterval = Arrays.asList(new Integer[] { 10 });
+
+		for (int runTime : runTimeInterval) {
+			for (int commRange : commRangeInterval) {
+				for (double commReliability : commReliabilityInterval) {
+					for (int numTaxis : numTaxisInterval) {
+						for (int numCustomers : numCustomersInterval) {
+							for (double newCustomerProb : newCustomerProbInterval) {
+								for (int seeRange : seeRangeInterval) {
+									exps.add(new Parameter(runTime, commRange, commReliability, numTaxis, numCustomers,
+											newCustomerProb, seeRange, new Metric()));
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
 		nrOfexpsRunning = exps.size();

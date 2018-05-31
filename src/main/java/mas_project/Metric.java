@@ -11,7 +11,7 @@ public class Metric {
 	private int numMessagesSent;
 	private int numNewParcelsComm;
 	private int ticksSpentIdle;
-	private int ticks;
+	private int ticks; // ticks = ticks*nrOfAgents
 	private List<Long> numParcelsKnownPerTick;
 	private double numParcelsKnownPerTickAverage;
 
@@ -61,14 +61,6 @@ public class Metric {
 	public int getResult() {
 		// return passengersDelivered;
 		return -1;
-	}
-
-	@Override
-	public String toString() {
-		return "[passengersDelivered:" + passengersDelivered + "]" + "[passengersSpawned:" + passengersSpawned + "]"
-				+ "[numMessagesSent:" + numMessagesSent + "]" + "[numNewParcelsComm:" + numNewParcelsComm + "]"
-				+ "[ticksSpentIdle:" + ticksSpentIdle + "]" + "[ticks:" + ticks + "]" + "[numParcelsKnown:"
-				+ numParcelsKnownPerTickAverage + "]";
 	}
 
 	public static String csvHeader() {

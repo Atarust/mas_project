@@ -10,6 +10,7 @@ import com.github.rinde.rinsim.core.model.comm.CommDevice;
 import com.github.rinde.rinsim.core.model.comm.CommDeviceBuilder;
 import com.github.rinde.rinsim.core.model.comm.CommUser;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel;
+import com.github.rinde.rinsim.core.model.pdp.PDPModel.ParcelState;
 import com.github.rinde.rinsim.core.model.pdp.Parcel;
 import com.github.rinde.rinsim.core.model.pdp.Vehicle;
 import com.github.rinde.rinsim.core.model.pdp.VehicleDTO;
@@ -49,7 +50,7 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 		super(getAgent(startPosition, Parameter.MAX_CAPACITY));
 		this.rng = rng;
 		this.metric = parameter.metric;
-		this.SEE_RANGE = Parameter.seeRange;
+		this.SEE_RANGE = parameter.seeRange;
 		this.COMM_RANGE = parameter.commRange;
 		this.commReliability = parameter.commReliability;
 		agent = new BDIAgent(rng, metric);
