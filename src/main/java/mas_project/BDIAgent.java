@@ -149,7 +149,7 @@ public class BDIAgent implements IBDIAgent {
 				if (action.isInCargo(passenger.get())) {
 					action.deliver(passenger.get(), time);
 				} else {
-					System.out.println("Warning: Parcel was not in cargo anymore. idc lol");
+					//System.out.println("Warning: Parcel was not in cargo anymore. idc lol");
 				}
 				if (action.hasEmptyCargo()) {
 					forgetPassenger(action);
