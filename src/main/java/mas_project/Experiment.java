@@ -17,14 +17,14 @@ public class Experiment {
 		// set parameters
 		exps = new LinkedList<>();
 
-		List<Integer> runTimeInterval = ints(1000 * 10000);
-		List<Integer> commRangeInterval = ints( 10 * 1000, 1000*1000);
+		List<Integer> runTimeInterval = ints(1000 * 1000);
+		List<Integer> commRangeInterval = ints( 1, 10 * 1000, 1000*1000);
 		List<Double> commReliabilityInterval = doubles(1.0);
-		List<Integer> numTaxisInterval = ints(5,10,20,50);
+		List<Integer> numTaxisInterval = ints(5);
 		List<Integer> numCustomersInterval = ints(10);
 		List<Double> newCustomerProbInterval = doubles(0.01);
 		List<Integer> seeRangeInterval = ints(1000);
-		List<Double> lazyProbInterval = doubles(0.5);
+		List<Double> lazyProbInterval = doubles(0.0);
 
 		for (int runTime : runTimeInterval) {
 			for (int commRange : commRangeInterval) {
@@ -79,7 +79,7 @@ public class Experiment {
 		for (Parameter exp : exps) {
 			content += Parameter.listToCSV(exp.toCSV()) + "\n";
 		}
-		Utils.writeToCSV(content, "preliminary_exploration_searchImpact4");
+		Utils.writeToCSV(content, "mas_taxi_delivery_data");
 
 		System.out.println("DONE.");
 	}

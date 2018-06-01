@@ -11,7 +11,7 @@ import java.util.List;
 public class Utils {
 	public static void writeToCSV(String content, String filename) {
 		// Get the file reference
-		Path path = Paths.get("results/" + filename + ".csv");
+		Path path = Paths.get(filename + ".csv");
 
 		// Use try-with-resource to get auto-closeable writer instance
 		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
