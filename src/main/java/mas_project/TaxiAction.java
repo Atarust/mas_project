@@ -238,6 +238,13 @@ public class TaxiAction {
 		}
 	}
 
+	public void broadcastForgetInformation(Parcel passenger) {
+		if (device.isPresent()) {
+			device.get().broadcast(new ForgetInformation(passenger), commRange);
+		}
+	}
+
+	
 	/**
 	 * @return object location information, which were broadcasted since last
 	 *         function call.
@@ -302,6 +309,16 @@ public class TaxiAction {
 			this.parcel = passenger;
 		}
 	}
+	
+	static class ForgetInformation implements MessageContents {
+		public final Parcel parcel;
+
+		ForgetInformation(Parcel passenger) {
+			this.parcel = passenger;
+		}
+	}
+	
+	
 
 	public double distanceTo(Parcel passenger) {
 		return distanceStraightLine(agent, passenger);

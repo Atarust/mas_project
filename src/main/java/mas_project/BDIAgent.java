@@ -3,20 +3,20 @@ package mas_project;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.math3.random.RandomGenerator;
 
 import com.github.rinde.rinsim.core.model.comm.MessageContents;
-import com.github.rinde.rinsim.core.model.pdp.Parcel;
 import com.github.rinde.rinsim.core.model.pdp.PDPModel.ParcelState;
+import com.github.rinde.rinsim.core.model.pdp.Parcel;
 import com.github.rinde.rinsim.core.model.road.RoadUser;
 import com.github.rinde.rinsim.core.model.time.TimeLapse;
 import com.github.rinde.rinsim.geom.Point;
 import com.google.common.base.Optional;
 
+import mas_project.TaxiAction.ForgetInformation;
 import mas_project.TaxiAction.ObjectPosition;
 import mas_project.TaxiAction.Reservation;
 import mas_project.TaxiAction.Unreservation;
@@ -76,7 +76,8 @@ public class BDIAgent implements IBDIAgent {
 		knownObjects.entrySet().stream().forEach(entry -> action.broadcastNewObject(entry.getKey(), entry.getValue()));
 
 		// TODO communicate old passengers
-
+		oldParcels.stream().forEach(parcel -> action.broadcastForgetInformation(parcel));
+		
 		processMessages(action.readMessages());
 		metric.newParcelCommunicated(nrParcelsBeforeComm - knownObjects.size());
 		oldParcels.stream().forEach(oldPassenger -> knownObjects.remove(oldPassenger));
@@ -226,6 +227,12 @@ public class BDIAgent implements IBDIAgent {
 			Parcel parcelToForget = ((Unreservation) unreservation).parcel;
 			claimedParcels.remove(parcelToForget);
 		});
+		
+		messages.stream().filter(m -> m instanceof TaxiAction.ForgetInformation).forEach(message -> {
+			ForgetInformation forgetMessage = (TaxiAction.ForgetInformation) message;
+			oldParcels.add(forgetMessage.parcel);
+		});
+		
 	}
 
 	@Override
