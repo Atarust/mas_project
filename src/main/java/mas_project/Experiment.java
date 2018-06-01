@@ -1,11 +1,8 @@
 package mas_project;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
+import static mas_project.Utils.doubles;
+import static mas_project.Utils.ints;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,14 +16,14 @@ public class Experiment {
 		// set parameters
 		exps = new LinkedList<>();
 
-		List<Integer> runTimeInterval = Arrays.asList(new Integer[] { 1000 * 2000 });
-		List<Integer> commRangeInterval = Arrays.asList(new Integer[] { 10, 100 * 10000 });
-		List<Double> commReliabilityInterval = Arrays.asList(new Double[] { 1.0 });
-		List<Integer> numTaxisInterval = Arrays.asList(new Integer[] { 10});
-		List<Integer> numCustomersInterval = Arrays.asList(new Integer[] { 5 });
-		List<Double> newCustomerProbInterval = Arrays.asList(new Double[] { 0.02 });
-		List<Integer> seeRangeInterval = Arrays.asList(new Integer[] { 1000 });
-		List<Double> lazyProbInterval = Arrays.asList(new Double[] { 0.1 });
+		List<Integer> runTimeInterval = ints(1000 * 5000);
+		List<Integer> commRangeInterval = ints(1, 100, 1 * 1000, 2 * 1000, 5 * 1000, 7 * 1000, 10 * 1000);
+		List<Double> commReliabilityInterval = doubles(1.0);
+		List<Integer> numTaxisInterval = ints(10);
+		List<Integer> numCustomersInterval = ints(10);
+		List<Double> newCustomerProbInterval = doubles(0.02);
+		List<Integer> seeRangeInterval = ints(1000);
+		List<Double> lazyProbInterval = doubles(0.5);
 
 		for (int runTime : runTimeInterval) {
 			for (int commRange : commRangeInterval) {
@@ -81,22 +78,8 @@ public class Experiment {
 		for (Parameter exp : exps) {
 			content += Parameter.listToCSV(exp.toCSV()) + "\n";
 		}
-		writeToCSV(content, "filename");
-		
+		Utils.writeToCSV(content, "preliminary_exploration_searchImpact4");
+
 		System.out.println("DONE.");
 	}
-	
-	private static void writeToCSV(String content, String filename) {
-		// Get the file reference
-		Path path = Paths.get("results/" + filename + ".csv");
-
-		// Use try-with-resource to get auto-closeable writer instance
-		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-			writer.write(content);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 }
