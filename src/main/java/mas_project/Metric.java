@@ -19,7 +19,13 @@ public class Metric {
 	private List<Long> numParcelsKnownPerTick;
 	private List<Long> waitingTimePassenger; // If passenger is not picked up he is not counted. easier to implement
 	private Set<Parcel> gotDelivered;
+	/*
+	 * How many Parcels a taxi knows. If it knows if 5 passengers in one tick and in
+	 * the next tick it learns of two more, the average is 6.
+	 */
 	private double numParcelsKnownPerTickAverage;
+	private double numParcelsSeenPerTickAverage; // Parcels need not to be new.
+	
 	private double waitingTimePassengerAverage;
 
 	public Metric() {

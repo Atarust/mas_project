@@ -2,7 +2,6 @@ package mas_project;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.math3.random.RandomGenerator;
 
@@ -41,7 +40,7 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 	private PDPModel pm;
 	private Optional<CommDevice> device;
 	private Metric metric;
-	
+
 	private Set<Parcel> allHistoricPassengers = new HashSet<>();
 
 	private final IBDIAgent agent;

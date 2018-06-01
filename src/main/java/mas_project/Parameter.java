@@ -26,7 +26,7 @@ public class Parameter {
 
 	public final Metric metric;
 
-	public boolean testing = false;
+	public boolean testing = true;
 	public boolean gui = false;
 	
 	// Useless parameters

@@ -3,6 +3,7 @@ package mas_project;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ public class BDIAgent implements IBDIAgent {
 	/** All objects, the agent knows of */
 	Map<RoadUser, Point> knownObjects;
 	/** Passengers, where other agents claimed to pick them up */
-	Set<Parcel> claimedParcels;
+	Map<Parcel, Double> claimedParcels;
 	/** Passengers, which do not need to be picked up anymore. (TODO) */
 	Set<Parcel> oldParcels;
 
@@ -53,7 +54,7 @@ public class BDIAgent implements IBDIAgent {
 		this.lazyTaxi = rng.nextDouble() < lazyProb;
 		// Beliefs/Desires
 		knownObjects = new HashMap<>();
-		claimedParcels = new HashSet<>();
+		claimedParcels = new HashMap<>();
 		oldParcels = new HashSet<>();
 		// Intention
 		passenger = Optional.absent();
@@ -65,7 +66,7 @@ public class BDIAgent implements IBDIAgent {
 	@Override
 	public void updateBelief(TaxiAction action, TimeLapse time) {
 		knownObjects.putAll(action.see());
-		
+
 		// I need to remove the old parcels twice, because of the metric measurement.
 		oldParcels.stream().forEach(oldPassenger -> knownObjects.remove(oldPassenger));
 		oldParcels.stream().forEach(oldPassenger -> claimedParcels.remove(oldPassenger));
@@ -73,6 +74,9 @@ public class BDIAgent implements IBDIAgent {
 		int nrParcelsBeforeComm = knownObjects.size();
 		// broadcast all knowledge
 		knownObjects.entrySet().stream().forEach(entry -> action.broadcastNewObject(entry.getKey(), entry.getValue()));
+
+		// TODO communicate old passengers
+
 		processMessages(action.readMessages());
 		metric.newParcelCommunicated(nrParcelsBeforeComm - knownObjects.size());
 		oldParcels.stream().forEach(oldPassenger -> knownObjects.remove(oldPassenger));
@@ -85,14 +89,36 @@ public class BDIAgent implements IBDIAgent {
 		// System.out.println("I am " + state + (!passenger.isPresent()));
 		if (state == State.idle && !passenger.isPresent()) {
 			Set<RoadUser> passengers = knownObjects.keySet().stream().filter(obj -> obj instanceof Parcel)
-					.filter(obj -> !claimedParcels.contains(obj)).collect(Collectors.toSet());
+					.filter(obj -> !isClaimedBySomeoneCloser((Parcel) obj, action)).collect(Collectors.toSet());
 			if (!passengers.isEmpty() && !this.lazyTaxi) {
-				passenger = Optional.of((Parcel) TaxiAction.getRandomElement(passengers, rng));
-				action.broadcastReservation(passenger.get());
+				// passenger = Optional.of((Parcel) TaxiAction.getRandomElement(passengers,
+				// rng));
+				passenger = action.getNearestElement(passengers);
+				if (passenger.isPresent()) {
+					action.broadcastReservation(passenger.get());
+				}
 				state = State.goto_parcel;
 				state.log();
 			}
 		}
+
+		if (passenger.isPresent()) {
+			// if passenger got claimed by another taxi, think about changing your intention
+			if (claimedParcels.containsKey(passenger.get())) {
+				// TODO make sure the passenger is not claimed by yourself!
+				double ourDistance = action.distanceTo(passenger.get());
+				boolean contains = claimedParcels.entrySet().stream().filter(entry -> entry.getValue() < ourDistance)
+						.filter(entry -> entry.getKey().equals(passenger.get())).findAny().isPresent();
+				if (contains) {
+					passenger = Optional.absent();
+				}
+			}
+		}
+	}
+
+	private boolean isClaimedBySomeoneCloser(Parcel obj, TaxiAction action) {
+		double ownDist = action.distanceTo(obj);
+		return claimedParcels.containsKey(obj) && claimedParcels.get(obj) < ownDist;
 	}
 
 	@Override
@@ -112,12 +138,10 @@ public class BDIAgent implements IBDIAgent {
 				} else {
 					randomPosition = Optional.of(action.randomPosition());
 				}
-				if (this.lazyTaxi) {
-					state = State.idle;
-				}
 				break;
 			case goto_parcel:
-				if (passenger.isPresent() && action.isOnRoad(passenger.get()) && action.getParcelState(passenger.get()) == ParcelState.AVAILABLE) {
+				if (passenger.isPresent() && action.isOnRoad(passenger.get())
+						&& action.getParcelState(passenger.get()) == ParcelState.AVAILABLE) {
 					action.goTo(passenger.get().getPickupLocation(), time);
 					if (action.isAt(passenger.get().getPickupLocation())) {
 						state = State.pickup;
@@ -136,8 +160,10 @@ public class BDIAgent implements IBDIAgent {
 					if (action.isInCargo(passenger.get())) {
 						state = State.goto_dest;
 						state.log();
-					} else if(action.hasEmptyCargo() && action.getParcelState(passenger.get()) != ParcelState.PICKING_UP) {
-						// Parcel is neither on roadmap, nor in cargo and it also doesn't pick up atm. Strange.
+					} else if (action.hasEmptyCargo()
+							&& action.getParcelState(passenger.get()) != ParcelState.PICKING_UP) {
+						// Parcel is neither on roadmap, nor in cargo and it also doesn't pick up atm.
+						// Strange.
 						// Only during Pickup, cargo is empty and parcel is off the road.
 						forgetPassenger(action);
 					}
@@ -157,7 +183,7 @@ public class BDIAgent implements IBDIAgent {
 				if (action.isInCargo(passenger.get())) {
 					action.deliver(passenger.get(), time);
 				} else {
-					//System.out.println("Warning: Parcel was not in cargo anymore. idc lol");
+					// System.out.println("Warning: Parcel was not in cargo anymore. idc lol");
 				}
 				if (action.hasEmptyCargo()) {
 					forgetPassenger(action);
@@ -169,6 +195,7 @@ public class BDIAgent implements IBDIAgent {
 				throw new RuntimeException("Error, Illegal state!");
 			}
 		}
+
 		metric.countTick();
 		if (isIdleAtBeginning && state == State.idle) {
 			metric.spentIdle();
@@ -190,7 +217,8 @@ public class BDIAgent implements IBDIAgent {
 
 		// note which objects are going to be transported by other agents
 		messages.stream().filter(m -> m instanceof TaxiAction.Reservation).forEach(reservation -> {
-			claimedParcels.add(((Reservation) reservation).parcel);
+			// TODO igore reservations which have a longer distance to passenger
+			claimedParcels.put(((Reservation) reservation).parcel, ((Reservation) reservation).distance);
 		});
 
 		// note, if objects are available to be picked up again.
@@ -199,10 +227,11 @@ public class BDIAgent implements IBDIAgent {
 			claimedParcels.remove(parcelToForget);
 		});
 	}
-	
+
 	@Override
 	public String toString() {
-		return "" + this.state + ", lazy=" + this.lazyTaxi + ", know=" + knownObjects.keySet().stream().filter(ru -> ru instanceof Parcel).count();
+		return "" + this.state + ", lazy=" + this.lazyTaxi + ", know="
+				+ knownObjects.keySet().stream().filter(ru -> ru instanceof Parcel).count();
 	}
 
 	static enum State {

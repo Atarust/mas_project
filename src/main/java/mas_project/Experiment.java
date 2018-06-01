@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.github.rinde.rinsim.core.Simulator;
 
+
 public class Experiment {
 	static List<Parameter> exps;
 	static int nrOfexpsRunning;
@@ -16,12 +17,12 @@ public class Experiment {
 		// set parameters
 		exps = new LinkedList<>();
 
-		List<Integer> runTimeInterval = ints(1000 * 5000);
-		List<Integer> commRangeInterval = ints(1, 100, 1 * 1000, 2 * 1000, 5 * 1000, 7 * 1000, 10 * 1000);
+		List<Integer> runTimeInterval = ints(1000 * 10000);
+		List<Integer> commRangeInterval = ints( 10 * 1000, 1000*1000);
 		List<Double> commReliabilityInterval = doubles(1.0);
-		List<Integer> numTaxisInterval = ints(10);
+		List<Integer> numTaxisInterval = ints(5,10,20,50);
 		List<Integer> numCustomersInterval = ints(10);
-		List<Double> newCustomerProbInterval = doubles(0.02);
+		List<Double> newCustomerProbInterval = doubles(0.01);
 		List<Integer> seeRangeInterval = ints(1000);
 		List<Double> lazyProbInterval = doubles(0.5);
 
@@ -35,8 +36,8 @@ public class Experiment {
 									for (double lazyProb : lazyProbInterval) {
 										Parameter p = new Parameter(runTime, commRange, commReliability, numTaxis,
 												numCustomers, newCustomerProb, seeRange, lazyProb, new Metric());
-										p.withGui(false);
-										p.withTesting(true);
+										p.withGui(true);
+										p.withTesting(false);
 										exps.add(p);
 									}
 								}

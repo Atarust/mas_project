@@ -27,9 +27,9 @@ import com.google.common.base.Optional;
 
 /**
  * This class is like your mummy. It tells you what you are allowed to do and
- * what you are not allowed to do. If your mummy allows you to pick up or deliver
- * an object, you are allowed to. If your mummy tells you that you can see the
- * person, than you can see the person.
+ * what you are not allowed to do. If your mummy allows you to pick up or
+ * deliver an object, you are allowed to. If your mummy tells you that you can
+ * see the person, than you can see the person.
  * 
  * This class abstracts from the implementation details of the framework and
  * gives simpler methods which define the capabilities in the given scenario.
@@ -124,10 +124,21 @@ public class TaxiAction {
 	 * @param obj2
 	 * @return distance when driving on roads - could be either length or time.
 	 */
-	public double distanceOnRoad(RoadUser obj1, RoadUser obj2) {
+	public double distanceStraightLine(RoadUser obj1, RoadUser obj2) {
 		// TODO: Which metric is used to measure "short"? Is it distance or time?
-		Measure<Double, Length> dist = rm.getDistanceOfPath(rm.getShortestPathTo(obj1, obj2));
-		return dist.doubleValue(dist.getUnit());
+		if (!rm.containsObject(obj1) || !rm.containsObject(obj2)) {
+			return Double.MAX_VALUE;
+		}
+
+		// Measure<Double, Length> dist =
+		// rm.getDistanceOfPath(rm.getShortestPathTo(rm.getPosition(obj1),
+		// rm.getPosition(obj2)));
+		// Measure<Double, Length> dist =
+		// rm.getDistanceOfPath(rm.getShortestPathTo(obj1, obj2));
+
+		return Point.distance(rm.getPosition(obj1), rm.getPosition(obj2));
+
+		// return dist.doubleValue(dist.getUnit());
 	}
 
 	/**
@@ -212,7 +223,7 @@ public class TaxiAction {
 	public void broadcastReservation(Parcel passenger) {
 		// TODO make sure to broadcast not to oneself!
 		if (device.isPresent()) {
-			device.get().broadcast(new Reservation(passenger), commRange);
+			device.get().broadcast(new Reservation(passenger, distanceStraightLine(agent, passenger)), commRange);
 		}
 	}
 
@@ -249,6 +260,21 @@ public class TaxiAction {
 		return passengerList.get(rng.nextInt(passengerList.size()));
 	}
 
+	public Optional<Parcel> getNearestElement(Set<RoadUser> roadUsers) {
+
+		double distance = Double.MAX_VALUE;
+		Optional<Parcel> closest = Optional.absent();
+		for (RoadUser ru : roadUsers.stream().filter(ru -> ru instanceof Parcel).collect(Collectors.toList())) {
+			double distToRu = distanceStraightLine(agent, ru);
+			if (distToRu < distance) {
+				distance = distToRu;
+				closest = Optional.of((Parcel) ru);
+			}
+		}
+
+		return closest;
+	}
+
 	static class ObjectPosition implements MessageContents {
 		public final RoadUser obj;
 		public final Point point;
@@ -261,9 +287,11 @@ public class TaxiAction {
 
 	static class Reservation implements MessageContents {
 		public final Parcel parcel;
+		public final double distance;
 
-		Reservation(Parcel passenger) {
+		Reservation(Parcel passenger, double distance) {
 			this.parcel = passenger;
+			this.distance = distance;
 		}
 	}
 
@@ -273,6 +301,10 @@ public class TaxiAction {
 		Unreservation(Parcel passenger) {
 			this.parcel = passenger;
 		}
+	}
+
+	public double distanceTo(Parcel passenger) {
+		return distanceStraightLine(agent, passenger);
 	}
 
 }
