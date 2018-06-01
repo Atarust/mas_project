@@ -14,7 +14,7 @@ public class Metric {
 	private int passengersSpawned;
 	private int numMessagesSent;
 	private int numNewParcelsComm;
-	private int ticksSpentIdle;
+	private int ticksTaxiSpentIdle;
 	private int ticks; // ticks = ticks*nrOfAgents
 	private List<Long> numParcelsKnownPerTick;
 	private List<Long> waitingTimePassenger; // If passenger is not picked up he is not counted. easier to implement
@@ -28,7 +28,7 @@ public class Metric {
 
 		numMessagesSent = 0;
 		numNewParcelsComm = 0;
-		ticksSpentIdle = 0;
+		ticksTaxiSpentIdle = 0;
 		ticks = 0;
 
 		numParcelsKnownPerTick = new LinkedList<>();
@@ -60,7 +60,7 @@ public class Metric {
 
 	public void spentIdle() {
 		// Was idle at beginning and idle at end. So a whole tick was idle.
-		ticksSpentIdle++;
+		ticksTaxiSpentIdle++;
 	}
 
 	public void newParcelsKnown(long l) {
@@ -82,12 +82,12 @@ public class Metric {
 	}
 
 	public static String csvHeader() {
-		return "passengersDelivered,passengersSpawned,numMessagesSent,numNewParcelsComm,ticksSpentIdle,ticks,numParcelsKnownPerTickAverage,waitingTimePassengerAverage";
+		return "passengersDelivered,passengersSpawned,numMessagesSent,numNewParcelsComm,ticksTaxiSpentIdle,ticks,numParcelsKnownPerTickAverage,waitingTimePassengerAverage";
 	}
 
 	public List<Object> toCSV() {
 		return Arrays.asList(new Object[] { passengersDelivered, passengersSpawned, numMessagesSent, numNewParcelsComm,
-				ticksSpentIdle, ticks, numParcelsKnownPerTickAverage, waitingTimePassengerAverage });
+				ticksTaxiSpentIdle, ticks, numParcelsKnownPerTickAverage, waitingTimePassengerAverage });
 	}
 
 }
