@@ -7,9 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.measure.Measure;
-import javax.measure.quantity.Length;
-
 import org.apache.commons.math3.random.RandomGenerator;
 
 import com.github.rinde.rinsim.core.model.comm.CommDevice;
@@ -34,7 +31,7 @@ import com.google.common.base.Optional;
  * This class abstracts from the implementation details of the framework and
  * gives simpler methods which define the capabilities in the given scenario.
  * 
- * @author jonas
+ * @author Jonas Kapitzke, Doruk Dündar
  *
  */
 public class TaxiAction {

@@ -8,6 +8,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author Jonas Kapitzke, Doruk Dündar
+ */
 public class Utils {
 	public static void writeToCSV(String content, String filename) {
 		// Get the file reference

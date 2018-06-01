@@ -54,7 +54,7 @@ import com.github.rinde.rinsim.ui.renderers.RoadUserRenderer;
  * If this class is run on MacOS it might be necessary to use
  * -XstartOnFirstThread as a VM argument.
  * 
- * @author Rinde van Lon
+ * @author Jonas Kapitzke, Doruk Dündar
  */
 public final class TaxiProblem {
 

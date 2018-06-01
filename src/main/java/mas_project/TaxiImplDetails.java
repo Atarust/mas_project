@@ -26,7 +26,7 @@ import com.google.common.base.Optional;
  * desires and intentions)
  * 
  * 
- * @author jonas
+ * @author Jonas Kapitzke, Doruk Dündar
  *
  */
 public class TaxiImplDetails extends Vehicle implements CommUser {

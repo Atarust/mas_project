@@ -9,6 +9,15 @@ import java.util.List;
 import com.github.rinde.rinsim.core.Simulator;
 
 
+/**
+ * Example showing a fleet of taxis that have to pickup and transport customers
+ * around the city of Leuven.
+ * <p>
+ * If this class is run on MacOS it might be necessary to use
+ * -XstartOnFirstThread as a VM argument.
+ * 
+ * @author  Jonas Kapitzke, Doruk Dündar
+ */
 public class Experiment {
 	static List<Parameter> exps;
 	static int nrOfexpsRunning;
