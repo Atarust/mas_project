@@ -143,6 +143,12 @@ public class BDIAgent implements IBDIAgent {
 				}
 				break;
 			case goto_parcel:
+				
+				if(!action.hasEmptyCargo()) {
+					System.out.println("I don't have an empty cargo I should deliver first!");
+					state = State.deliver;
+				}
+				
 				if (passenger.isPresent() && action.isOnRoad(passenger.get())
 						&& action.getParcelState(passenger.get()) == ParcelState.AVAILABLE) {
 					action.goTo(passenger.get().getPickupLocation(), time);
