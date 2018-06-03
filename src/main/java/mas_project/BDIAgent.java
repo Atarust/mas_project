@@ -110,7 +110,9 @@ public class BDIAgent implements IBDIAgent {
 				double ourDistance = action.distanceTo(passenger.get());
 				boolean contains = claimedParcels.entrySet().stream().filter(entry -> entry.getValue() < ourDistance)
 						.filter(entry -> entry.getKey().equals(passenger.get())).findAny().isPresent();
-				if (contains) {
+				if (contains && (state == State.goto_parcel || state == State.idle) && action.hasEmptyCargo()) {
+					// If passenger is being claimed by someone who is closer, and we are not
+					// already picking that guy up, then forget the guy.
 					passenger = Optional.absent();
 				}
 			}
@@ -150,13 +152,12 @@ public class BDIAgent implements IBDIAgent {
 					}
 				} else {
 					// Passenger not available anymore. Pickup by someone else maybe.
-					passenger = Optional.absent();
 					state = State.idle;
 					state.log();
 				}
 				break;
 			case pickup:
-				if (action.isAt(passenger.get().getPickupLocation())) {
+				if (passenger.isPresent() && action.isAt(passenger.get().getPickupLocation())) {
 					action.pickUp(passenger.get(), time);
 					if (action.isInCargo(passenger.get())) {
 						state = State.goto_dest;
@@ -169,8 +170,10 @@ public class BDIAgent implements IBDIAgent {
 						forgetPassenger(action);
 					}
 				} else {
-					throw new RuntimeException(
-							"Can not deliver, because not at right position. This should NEVER happen");
+					System.out.println("wtf - passenger disappeared.");
+
+					state = State.idle;
+					state.log();
 				}
 				break;
 			case goto_dest:
