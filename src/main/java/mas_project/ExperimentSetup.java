@@ -27,7 +27,7 @@ public class ExperimentSetup {
 		newCustomerProbInterval = doubles(0.01);
 		seeRangeInterval = ints(1000);
 		lazyProbInterval = doubles(0.0);
-		filename = String.valueOf(exp);
+		filename = String.valueOf(exp) + "_runtime" + runTimeInterval.get(0);
 
 		switch (exp) {
 		case 1:
