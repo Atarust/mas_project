@@ -51,7 +51,7 @@ public class Parameter {
 	public static final long TEST_STOP_TIME = 20 * 60 * 1000;
 	public static final int TEST_SPEED_UP = 64;
 
-	public final long RANDOM_SEED = 42L;
+	public final long RANDOM_SEED;
 
 	public Parameter(long runTime, int commRange, double commReliability, int numTaxis, int numCustomers,
 			double newCustomerProb, int seeRange, double lazyProb, Metric metric) {
@@ -65,6 +65,7 @@ public class Parameter {
 		this.lazyProb = lazyProb;
 		
 		this.metric = metric;
+		this.RANDOM_SEED = 42L + metric.hashCode();
 
 	}
 

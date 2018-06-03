@@ -16,38 +16,36 @@ import com.github.rinde.rinsim.core.Simulator;
  * If this class is run on MacOS it might be necessary to use
  * -XstartOnFirstThread as a VM argument.
  * 
- * @author  Jonas Kapitzke, Doruk Dündar
+ * @author Jonas Kapitzke, Doruk Dündar
  */
 public class Experiment {
 	static List<Parameter> exps;
 	static int nrOfexpsRunning;
+	final static int trials = 1;
+	static ExperimentSetup es;
 
 	public static void main(String[] args) {
-		// set parameters
 		exps = new LinkedList<>();
 
-		List<Integer> runTimeInterval = ints(1000 * 1000);
-		List<Integer> commRangeInterval = ints( 1, 10 * 1000, 1000*1000);
-		List<Double> commReliabilityInterval = doubles(1.0);
-		List<Integer> numTaxisInterval = ints(5);
-		List<Integer> numCustomersInterval = ints(10);
-		List<Double> newCustomerProbInterval = doubles(0.01);
-		List<Integer> seeRangeInterval = ints(1000);
-		List<Double> lazyProbInterval = doubles(0.0);
+		// Change experiment number here:
+		es = new ExperimentSetup(5);
 
-		for (int runTime : runTimeInterval) {
-			for (int commRange : commRangeInterval) {
-				for (double commReliability : commReliabilityInterval) {
-					for (int numTaxis : numTaxisInterval) {
-						for (int numCustomers : numCustomersInterval) {
-							for (double newCustomerProb : newCustomerProbInterval) {
-								for (int seeRange : seeRangeInterval) {
-									for (double lazyProb : lazyProbInterval) {
-										Parameter p = new Parameter(runTime, commRange, commReliability, numTaxis,
-												numCustomers, newCustomerProb, seeRange, lazyProb, new Metric());
-										p.withGui(true);
-										p.withTesting(false);
-										exps.add(p);
+		// set parameters
+		for (int runTime : es.runTimeInterval) {
+			for (int commRange : es.commRangeInterval) {
+				for (double commReliability : es.commReliabilityInterval) {
+					for (int numTaxis : es.numTaxisInterval) {
+						for (int numCustomers : es.numCustomersInterval) {
+							for (double newCustomerProb : es.newCustomerProbInterval) {
+								for (int seeRange : es.seeRangeInterval) {
+									for (double lazyProb : es.lazyProbInterval) {
+										for (int trial = 0; trial < trials; trial++) {
+											Parameter p = new Parameter(runTime, commRange, commReliability, numTaxis,
+													numCustomers, newCustomerProb, seeRange, lazyProb, new Metric());
+											p.withGui(false);
+											p.withTesting(true);
+											exps.add(p);
+										}
 									}
 								}
 							}
@@ -88,7 +86,7 @@ public class Experiment {
 		for (Parameter exp : exps) {
 			content += Parameter.listToCSV(exp.toCSV()) + "\n";
 		}
-		Utils.writeToCSV(content, "mas_taxi_delivery_data");
+		Utils.writeToCSV(content, "mas_taxi_delivery_data" + es.filename + ".csv");
 
 		System.out.println("DONE.");
 	}

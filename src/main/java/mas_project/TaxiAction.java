@@ -321,4 +321,9 @@ public class TaxiAction {
 		return distanceStraightLine(agent, passenger);
 	}
 
+	public Optional<Parcel> getCargoPassenger() {
+		java.util.Optional<Parcel> findFirst = pm.getContents(agent).stream().findFirst();
+		return Optional.fromNullable(findFirst.orElse(null));
+	}
+
 }
