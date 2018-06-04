@@ -86,7 +86,7 @@ public class Experiment {
 		for (Parameter exp : exps) {
 			content += Parameter.listToCSV(exp.toCSV()) + "\n";
 		}
-		Utils.writeToCSV(content, "mas_taxi_delivery_data" + es.filename + ".csv");
+		Utils.writeToCSV(content, "mas_taxi_delivery_data" + es.filename);
 
 		System.out.println("DONE.");
 	}
