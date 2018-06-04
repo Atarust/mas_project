@@ -63,12 +63,14 @@ public class TaxiImplDetails extends Vehicle implements CommUser {
 	protected void tickImpl(TimeLapse time) {
 		rm = getRoadModel();
 		pm = getPDPModel();
-		
+
 		// metric counts all passengers that ever existed
 		rm.getObjects().stream().filter(ru -> ru instanceof Parcel)
 				.forEach(ru -> allHistoricPassengers.add((Parcel) ru));
 		metric.passengerSpawned(allHistoricPassengers.size());
-		
+		metric.numParcelsAvailable(rm.getObjectsOfType(Parcel.class).stream()
+				.filter(p -> pm.getParcelState(p) == ParcelState.AVAILABLE).count());
+
 		final TaxiAction capabilities = new TaxiAction(this, rm, pm, device, rng, metric, SPEED, SEE_RANGE, COMM_RANGE);
 		agent.updateBelief(capabilities, time);
 		agent.updateDesire(capabilities, time);

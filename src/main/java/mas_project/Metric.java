@@ -18,6 +18,7 @@ public class Metric {
 	private int ticks; // ticks = ticks*nrOfAgents
 	private List<Long> numParcelsKnownPerTick;
 	private List<Long> waitingTimePassenger; // If passenger is not picked up he is not counted. easier to implement
+	private List<Long> numParcelsAvailablePerTick;
 	private Set<Parcel> gotDelivered;
 	/*
 	 * How many Parcels a taxi knows. If it knows if 5 passengers in one tick and in
@@ -25,7 +26,8 @@ public class Metric {
 	 */
 	private double numParcelsKnownPerTickAverage;
 	private double numParcelsSeenPerTickAverage; // Parcels need not to be new.
-	
+	private double numParcelsAvailablePerTickAverage;
+
 	private double waitingTimePassengerAverage;
 
 	public Metric() {
@@ -38,6 +40,8 @@ public class Metric {
 		ticks = 0;
 
 		numParcelsKnownPerTick = new LinkedList<>();
+		numParcelsAvailablePerTick = new LinkedList<>();
+
 		waitingTimePassenger = new LinkedList<>();
 		gotDelivered = new HashSet<>();
 
@@ -74,6 +78,13 @@ public class Metric {
 		numParcelsKnownPerTickAverage = numParcelsKnownPerTick.stream().mapToDouble(a -> a).average().orElse(-1);
 	}
 
+	public void numParcelsAvailable(long l) {
+		numParcelsAvailablePerTick.add(l);
+		numParcelsAvailablePerTickAverage = numParcelsAvailablePerTick.stream().mapToDouble(a -> a).average()
+				.orElse(-1);
+		System.out.println(numParcelsAvailablePerTickAverage);
+	}
+
 	public void parcelWaitingTime(long l, Parcel parcel) {
 		if (!gotDelivered.contains(parcel)) {
 			waitingTimePassenger.add(l);
@@ -88,12 +99,13 @@ public class Metric {
 	}
 
 	public static String csvHeader() {
-		return "passengersDelivered,passengersSpawned,numMessagesSent,numNewParcelsComm,ticksTaxiSpentIdle,ticks,numParcelsKnownPerTickAverage,waitingTimePassengerAverage";
+		return "passengersDelivered,passengersSpawned,numMessagesSent,numNewParcelsComm,ticksTaxiSpentIdle,ticks,numParcelsKnownPerTickAverage,numParcelsAvailablePerTickAverage,waitingTimePassengerAverage";
 	}
 
 	public List<Object> toCSV() {
 		return Arrays.asList(new Object[] { passengersDelivered, passengersSpawned, numMessagesSent, numNewParcelsComm,
-				ticksTaxiSpentIdle, ticks, numParcelsKnownPerTickAverage, waitingTimePassengerAverage });
+				ticksTaxiSpentIdle, ticks, numParcelsKnownPerTickAverage, numParcelsAvailablePerTickAverage,
+				waitingTimePassengerAverage });
 	}
 
 }
