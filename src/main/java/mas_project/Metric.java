@@ -82,7 +82,7 @@ public class Metric {
 		numParcelsAvailablePerTick.add(l);
 		numParcelsAvailablePerTickAverage = numParcelsAvailablePerTick.stream().mapToDouble(a -> a).average()
 				.orElse(-1);
-		System.out.println(numParcelsAvailablePerTickAverage);
+		//System.out.println(numParcelsAvailablePerTickAverage);
 	}
 
 	public void parcelWaitingTime(long l, Parcel parcel) {
