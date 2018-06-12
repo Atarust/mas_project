@@ -67,6 +67,18 @@ public class BDIAgent implements IBDIAgent {
 	public void updateBelief(TaxiAction action, TimeLapse time) {
 		knownObjects.putAll(action.see());
 
+		action.see().keySet().stream().forEach(seenP -> {
+			if (oldParcels.contains(seenP)) {
+				System.out.println(seenP + " is seen, but was declared old. Maybe I should remove it from oldParcels.");
+			}
+		});
+
+		action.see().keySet().stream().filter(p -> p instanceof Parcel)
+				.forEach(p -> metric.newParcelsSeen(((Parcel) p), time.getTime()));
+
+		// If parcel can be seen, it is not an old parcel.
+		oldParcels.removeAll(action.see().keySet());
+
 		// I need to remove the old parcels twice, because of the metric measurement.
 		oldParcels.stream().forEach(oldPassenger -> knownObjects.remove(oldPassenger));
 		oldParcels.stream().forEach(oldPassenger -> claimedParcels.remove(oldPassenger));
@@ -164,6 +176,7 @@ public class BDIAgent implements IBDIAgent {
 				break;
 			case pickup:
 				if (passenger.isPresent() && action.isAt(passenger.get().getPickupLocation())) {
+					metric.parcelPicked(passenger.get(), time.getTime());
 					action.pickUp(passenger.get(), time);
 					if (action.isInCargo(passenger.get())) {
 						state = State.goto_dest;
