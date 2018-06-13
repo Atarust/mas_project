@@ -160,11 +160,11 @@ public class BDIAgent implements IBDIAgent {
 					System.out.println("I don't have an empty cargo I should deliver first!");
 					state = State.deliver;
 				}
-				
-				if (passenger.isPresent() && action.isOnRoad(passenger.get())
-						&& action.getParcelState(passenger.get()) == ParcelState.AVAILABLE) {
+
+				if (passenger.isPresent()) {
 					action.goTo(passenger.get().getPickupLocation(), time);
-					if (action.isAt(passenger.get().getPickupLocation())) {
+					if (action.isAt(passenger.get().getPickupLocation()) && action.isOnRoad(passenger.get())
+							&& action.getParcelState(passenger.get()) == ParcelState.AVAILABLE) {
 						state = State.pickup;
 						state.log();
 					}
