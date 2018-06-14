@@ -22,6 +22,7 @@ public class Metric {
 	private List<Long> waitingTimePassenger; // If passenger is not picked up he is not counted. easier to implement
 	private List<Long> numParcelsAvailablePerTick;
 	private Set<Parcel> gotDelivered;
+	private int nrOfLazy;
 
 	private Map<Parcel, Long> seenTime;
 	private Map<Parcel, Long> pickedTime;
@@ -46,6 +47,7 @@ public class Metric {
 		numNewParcelsComm = 0;
 		ticksTaxiSpentIdle = 0;
 		ticks = 0;
+		nrOfLazy = 0;
 
 		numParcelsKnownPerTick = new LinkedList<>();
 		numParcelsAvailablePerTick = new LinkedList<>();
@@ -79,6 +81,10 @@ public class Metric {
 		ticks++;
 	}
 
+	public void isLazy() {
+		nrOfLazy++;
+	}
+	
 	public void spentIdle() {
 		// Was idle at beginning and idle at end. So a whole tick was idle.
 		ticksTaxiSpentIdle++;
@@ -130,13 +136,13 @@ public class Metric {
 	}
 
 	public static String csvHeader() {
-		return "passengersDelivered,passengersSpawned,numMessagesSent,numNewParcelsComm,ticksTaxiSpentIdle,ticks,numParcelsKnownPerTickAverage,numParcelsAvailablePerTickAverage,waitingTimePassengerAverage,ticksBetweenSeenAndPickedAverage";
+		return "passengersDelivered,passengersSpawned,numMessagesSent,numNewParcelsComm,ticksTaxiSpentIdle,ticks,numParcelsKnownPerTickAverage,numParcelsAvailablePerTickAverage,waitingTimePassengerAverage,ticksBetweenSeenAndPickedAverage,nrOfLazy";
 	}
 
 	public List<Object> toCSV() {
 		return Arrays.asList(new Object[] { passengersDelivered, passengersSpawned, numMessagesSent, numNewParcelsComm,
 				ticksTaxiSpentIdle, ticks, numParcelsKnownPerTickAverage, numParcelsAvailablePerTickAverage,
-				waitingTimePassengerAverage, ticksBetweenSeenAndPickedAverage });
+				waitingTimePassengerAverage, ticksBetweenSeenAndPickedAverage, nrOfLazy });
 	}
 
 }

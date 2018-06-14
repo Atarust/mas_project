@@ -52,6 +52,9 @@ public class BDIAgent implements IBDIAgent {
 		this.metric = metric;
 
 		this.lazyTaxi = rng.nextDouble() < lazyProb;
+		if(lazyTaxi) {
+			metric.isLazy();
+		}
 		// Beliefs/Desires
 		knownObjects = new HashMap<>();
 		claimedParcels = new HashMap<>();
