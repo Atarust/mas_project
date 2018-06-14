@@ -138,11 +138,17 @@ public class BDIAgent implements IBDIAgent {
 
 	@Override
 	public void updateIntention(TaxiAction action, TimeLapse time) {
+		int loop = 0;
+		
 		boolean isIdleAtBeginning = state == State.idle;
 		if (this.lazyTaxi) {
 			state = State.idle;
 		}
 		while (time.hasTimeLeft()) {
+			if(loop++ > 1000) {
+				System.out.println("endless loop. exiting." + loop + state);
+				break;
+			}
 			switch (state) {
 			case idle:
 				if (randomPosition.isPresent()) {
