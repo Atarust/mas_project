@@ -173,6 +173,12 @@ public class BDIAgent implements IBDIAgent {
 							&& action.getParcelState(passenger.get()) == ParcelState.AVAILABLE) {
 						state = State.pickup;
 						state.log();
+					} else if (action.isAt(passenger.get().getPickupLocation()) && !action.isOnRoad(passenger.get())){
+						// passenger left
+						state = State.idle;
+						state.log();
+						oldParcels.add(passenger.get());
+						passenger = Optional.absent();
 					}
 				} else {
 					// Passenger not available anymore. Pickup by someone else maybe.
