@@ -28,7 +28,7 @@ public class Experiment {
 		exps = new LinkedList<>();
 
 		// Change experiment number here:
-		es = new ExperimentSetup(5);
+		es = new ExperimentSetup(20);
 
 		// set parameters
 		for (int runTime : es.runTimeInterval) {
@@ -42,13 +42,13 @@ public class Experiment {
 										for (int trial = 0; trial < trials; trial++) {
 											Parameter p = new Parameter(runTime, commRange, commReliability, numTaxis,
 													numCustomers, newCustomerProb, seeRange, lazyProb, new Metric());
-											p.withGui(false);
-											p.withTesting(true);
+											p.withGui(true);
+											p.withTesting(false);
 											exps.add(p);
 										}
 									}
 								}
-							}
+							} 
 						}
 					}
 				}

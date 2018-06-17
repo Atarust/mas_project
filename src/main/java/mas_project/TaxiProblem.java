@@ -70,7 +70,7 @@ public final class TaxiProblem {
 	
 	public static Simulator run(Parameter parameter) {
 
-		final View.Builder view = createGui(parameter.testing, Parameter.display, Parameter.m, Parameter.list);
+		final View.Builder view = createGui(parameter.testing, parameter, Parameter.display, Parameter.m, Parameter.list);
 
 		final Simulator simulator;
 		if (parameter.gui) {
@@ -125,20 +125,34 @@ public final class TaxiProblem {
 		return simulator;
 
 	}
-	static View.Builder createGui(boolean testing, @Nullable Display display, @Nullable Monitor m,
+	static View.Builder createGui(boolean testing, Parameter parameter, @Nullable Display display, @Nullable Monitor m,
 			@Nullable Listener list) {
 
-		View.Builder view = View.builder().with(GraphRoadModelRenderer.builder())
-				.with(RoadUserRenderer.builder()
-						.withImageAssociation(TaxiBase.class, "/graphics/perspective/tall-building-64.png")
-						.withImageAssociation(TaxiImplDetails.class, "/graphics/flat/taxi-32.png")
-						.withImageAssociation(Customer.class, "/graphics/flat/person-red-32.png"))
-				// .with(TaxiRenderer.builder(Language.ENGLISH))
-				.withTitleAppendix("Taxi Demo")
-		 .with(CommRenderer.builder()
-		 .withReliabilityColors()
-		 .withToString()
-		 .withMessageCount());
+		
+		
+		View.Builder view;
+		boolean renderComm = parameter.commRange < 100000;
+		if(renderComm) {
+			view = View.builder().with(GraphRoadModelRenderer.builder())
+					.with(RoadUserRenderer.builder()
+							.withImageAssociation(TaxiBase.class, "/graphics/perspective/tall-building-64.png")
+							.withImageAssociation(TaxiImplDetails.class, "/graphics/flat/taxi-32.png")
+							.withImageAssociation(Customer.class, "/graphics/flat/person-red-32.png"))
+					// .with(TaxiRenderer.builder(Language.ENGLISH))
+					.withTitleAppendix("Taxi Demo")
+			 .with(CommRenderer.builder()
+			 .withReliabilityColors()
+			 .withToString()
+			 .withMessageCount());
+		} else {
+			view = View.builder().with(GraphRoadModelRenderer.builder())
+					.with(RoadUserRenderer.builder()
+							.withImageAssociation(TaxiBase.class, "/graphics/perspective/tall-building-64.png")
+							.withImageAssociation(TaxiImplDetails.class, "/graphics/flat/taxi-32.png")
+							.withImageAssociation(Customer.class, "/graphics/flat/person-red-32.png"))
+					// .with(TaxiRenderer.builder(Language.ENGLISH))
+					.withTitleAppendix("Taxi Demo");
+		 }
 
 		if (testing) {
 			view = view.withAutoClose().withAutoPlay().withSimulatorEndTime(Parameter.TEST_STOP_TIME).withSpeedUp(Parameter.TEST_SPEED_UP);

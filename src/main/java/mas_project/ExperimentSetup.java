@@ -46,7 +46,7 @@ public class ExperimentSetup {
 		case 5:
 			numTaxisInterval = ints(2, 5, 10, 20);
 			break;
-		case 6:
+		case 6: // I want  run from this with lots of trials
 			numTaxisInterval = ints(2, 5, 10, 20);
 			newCustomerProbInterval = doubles(0.001, 0.005, 0.02, 0.1);
 			break;
@@ -89,9 +89,39 @@ public class ExperimentSetup {
 			numTaxisInterval = ints(2, 5, 10);
 			newCustomerProbInterval = doubles(0.01);
 			break;
-
+		case 13:
+			numTaxisInterval = ints(20,5);
+			numCustomersInterval = ints(200,100,50,10,1);
+			newCustomerProbInterval = doubles(0.0);
+			break;
+		case 14: // run with, but only at the end, with good default parameters
+			lazyProbInterval = doubles(0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0);
+			break;
+		case 15:
+			numTaxisInterval = ints(2,3,4, 5,6,7,8,9, 10,15, 20);
+			break;
+		case 16: // 9 with only important things to have more trials
+			seeRangeInterval = ints(31, 31*10, 31 * 1000);
+			break;
+		case 17: // micro
+			seeRangeInterval = ints(100);
+			numTaxisInterval = ints(50);
+			//numCustomersInterval = ints(10);
+			newCustomerProbInterval = doubles(0.1);
+			break;	
+			
+		case 18: // exp3
+			numTaxisInterval = ints(5);
+			newCustomerProbInterval = doubles(0.1);
+			
+			seeRangeInterval = ints(10, 100, 1000, 10 * 1000, 100 * 1000, 1000 * 1000);
+			break;	
+		case 20:
+			commRangeInterval = ints(1, 3 * 1000, 10 * 1000, 30*1000, 1000 * 1000);
+			break;
+			
 		default:
-			throw new IllegalArgumentException("Experiment not defined.");
+			throw new IllegalArgumentException("Experiment not defined. PROBABLY A break; is missing in ExperimentSetup.!");
 		}
 
 		filename = String.valueOf(exp) + "_runtime" + runTimeInterval.get(0);
