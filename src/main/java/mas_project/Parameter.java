@@ -65,7 +65,7 @@ public class Parameter {
 		this.lazyProb = lazyProb;
 		
 		this.metric = metric;
-		this.RANDOM_SEED = 42L;// + metric.hashCode();
+		this.RANDOM_SEED = 25L;// + metric.hashCode();
 
 	}
 

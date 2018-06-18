@@ -264,18 +264,23 @@ public class BDIAgent implements IBDIAgent {
 			Parcel parcelToForget = ((Unreservation) unreservation).parcel;
 			claimedParcels.remove(parcelToForget);
 		});
-		
+
 		messages.stream().filter(m -> m instanceof TaxiAction.ForgetInformation).forEach(message -> {
 			ForgetInformation forgetMessage = (TaxiAction.ForgetInformation) message;
 			oldParcels.add(forgetMessage.parcel);
 		});
-		
+
 	}
 
 	@Override
 	public String toString() {
-		return "" + this.state + ", lazy=" + this.lazyTaxi + ", know="
-				+ knownObjects.keySet().stream().filter(ru -> ru instanceof Parcel).count();
+		if(this.lazyTaxi) {
+			return "" + this.state + ", know="
+					+ knownObjects.keySet().stream().filter(ru -> ru instanceof Parcel).count() + " lazy";
+		} else {
+			return "" + this.state + ", know="
+					+ knownObjects.keySet().stream().filter(ru -> ru instanceof Parcel).count();
+		}
 	}
 
 	static enum State {

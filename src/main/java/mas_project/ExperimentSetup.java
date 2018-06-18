@@ -22,11 +22,11 @@ public class ExperimentSetup {
 		runTimeInterval = ints(1000 * 10000);
 		commRangeInterval = ints(1, 1000 * 1000);
 		commReliabilityInterval = doubles(1.0);
-		numTaxisInterval = ints(5);
-		numCustomersInterval = ints(10);
-		newCustomerProbInterval = doubles(0.005);
-		seeRangeInterval = ints(1000);
-		lazyProbInterval = doubles(0.0);
+		numTaxisInterval = ints(10);
+		numCustomersInterval = ints(15);
+		newCustomerProbInterval = doubles(0.01);
+		seeRangeInterval = ints(2000);
+		lazyProbInterval = doubles(0.6);
 		filename = String.valueOf(exp) + "_runtime" + runTimeInterval.get(0);
 
 		switch (exp) {
@@ -117,7 +117,7 @@ public class ExperimentSetup {
 			seeRangeInterval = ints(10, 100, 1000, 10 * 1000, 100 * 1000, 1000 * 1000);
 			break;	
 		case 20:
-			commRangeInterval = ints(1, 3 * 1000, 10 * 1000, 30*1000, 1000 * 1000);
+			commRangeInterval = ints(1, 3 * 1000, 10 * 1000, 15*1000, 1000 * 1000);
 			break;
 			
 		default:
